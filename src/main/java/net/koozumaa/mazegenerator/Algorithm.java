@@ -1,14 +1,17 @@
 package net.koozumaa.mazegenerator;
 
+import net.koozumaa.mazegenerator.Utils.KoozuPair;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class Algorithm {
     private MazeGenerator plugin;
+
     public Algorithm(MazeGenerator plugin) {
         this.plugin = plugin;
     }
@@ -18,7 +21,7 @@ public class Algorithm {
 
     public void generate2(Player player, final Location startLocation, final Location finishLocation) {
         KoozuPair<Location, Location> invertedLocations = getInvertedLocations(startLocation, finishLocation);
-        final Location start = invertedLocations.getKey();
+        final Location start = invertedLocations.getKey().clone();
         final Location realFinish = invertedLocations.getValue();
         Location finish = devideLocation(start, realFinish);
 
@@ -281,36 +284,17 @@ public class Algorithm {
     Location loca;
     Location lastVisited;
 
-    public void solveMaze(final Location startLoc, final Location finishLoc) {
+    public void solveMaze(final Location pos1, final Location pos2) {
+
+        KoozuPair<Location, Location> invertedLocations = getInvertedLocations(pos1, pos2);
+        final Location startLoc = invertedLocations.getKey();
+        final Location finishLoc = invertedLocations.getValue();
+
         ArrayList<Location> path = new ArrayList<>();
         loca = startLoc.clone();
         lastVisited = loca.clone();
         path.add(loca);
-        /*
-        do {
-            max++;
-            ArrayList<Location> aroundLocs = getBlocksAround(iAmHere);
-            ArrayList<Location> aroundLocClone = getBlocksAround(iAmHere);
-            for (int i = 0; i < aroundLocs.size(); i++) {
-                if (!isInRegion(aroundLocs.get(i), startLoc, finishLoc)) {
-                    aroundLocClone.remove(aroundLocs.get(i));
-                } else if (!aroundLocClone.get(i).getBlock().getType().equals(Material.AIR)) {
-                    aroundLocClone.remove(aroundLocs.get(i));
-                }
-            }
-            if (!aroundLocClone.isEmpty()) {
-                int rand = random.nextInt(aroundLocClone.size());
-                path.add(aroundLocClone.get(rand));
-                iAmHere = aroundLocClone.get(rand);
-            } else {
-                path.remove(iAmHere);
-                iAmHere = path.get(path.size() - 1);
-            }
-        } while (iAmHere.getBlockX() != finishLoc.getBlockX() || iAmHere.getBlockZ() != finishLoc.getBlockZ() || max == 1000);
 
-        path.forEach(loc -> loc.getBlock().setType(Material.BLUE_TERRACOTTA));
-
-         */
 
         ArrayList<KoozuPair<Location, ArrayList<Location>>> intersections = new ArrayList<>();
         ArrayList<Location> notRightPath = new ArrayList<>();
@@ -333,7 +317,7 @@ public class Algorithm {
                     if (!intersections.isEmpty()) {
                         for (KoozuPair<Location, ArrayList<Location>> ic : intersections) {
                             if (ic.getKey().getBlock().equals(loca.getBlock())) {
-                                if (ic.getValue().contains(aroundLocs.get(i))){
+                                if (ic.getValue().contains(aroundLocs.get(i))) {
                                     aroundLocClone.remove(aroundLocs.get(i));
                                 }
                                 break;
@@ -344,7 +328,7 @@ public class Algorithm {
                 }
                 if (aroundLocClone.isEmpty()) {
                     if (path.isEmpty()) {
-                        Bukkit.broadcastMessage("mitä vittuA");
+                        Bukkit.broadcastMessage("Nyt kävi nolosti");
                         cancel();
                         return;
 
@@ -357,7 +341,7 @@ public class Algorithm {
                     return;
                 }
                 int rand = random.nextInt(aroundLocClone.size());
-                if (aroundLocs.size() > 1){
+                if (aroundLocs.size() > 1) {
                     for (int i = 0; i < intersections.size(); i++) {
                         KoozuPair<Location, ArrayList<Location>> ic = intersections.get(i);
                         if (ic.getKey().getBlock().equals(loca.getBlock())) {
@@ -375,7 +359,7 @@ public class Algorithm {
                 loca = aroundLocClone.get(rand);
                 path.add(loca);
                 loca.getBlock().setType(Material.BLUE_TERRACOTTA);
-                if (finishLoc.getBlockX() <= loca.getBlockX()) {
+                if (finishLoc.getBlockX() <= loca.getBlockX() && finishLoc.getBlockZ() <= loca.getBlockZ()) {
                     cancel();
                 }
 

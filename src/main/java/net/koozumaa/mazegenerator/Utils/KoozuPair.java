@@ -1,4 +1,4 @@
-package net.koozumaa.mazegenerator;
+package net.koozumaa.mazegenerator.Utils;
 
 public class KoozuPair<K, V> {
 

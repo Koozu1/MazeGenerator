@@ -3,6 +3,7 @@ version: ${project.version}
 main: net.koozumaa.mazegenerator.MazeGenerator
 api-version: 1.16
 authors: [ Koozu ]
+load: STARTUP
 commands:
   maze:
     permission: maze
