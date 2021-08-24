@@ -13,5 +13,14 @@ public enum Mode {
     },
     WORLDGEN{
         public String toString(){return this.name();}
+    },
+    CUSTOM{
+        public String toString(){return this.name();}
+
+        public int getLength() {
+            return length;
+        }
+
+        public int length = 1;
     }
 }

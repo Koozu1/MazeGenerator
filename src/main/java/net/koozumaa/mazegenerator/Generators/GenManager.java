@@ -34,6 +34,14 @@ public class GenManager {
         plugin.mainGenerator.calculateMazeLocs(pVar, locations -> {
             Bukkit.broadcastMessage("Donecalc");
             ArrayList<KoozuPair<Location, Material>> blocks;
+            /*
+            Bukkit.getScheduler().runTask(MazeGenerator.instance, () ->{
+                locations.forEach(loc -> {
+                    world.getBlockAt(loc).setType(Material.BLUE_TERRACOTTA);
+                });
+            });
+
+             */
             switch (genMode) {
                 case NORMAL:
                     //ArrayList<Location> normLocs =  plugin.utils.stretchTo3Times(mazeBlocks, pos1);

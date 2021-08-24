@@ -32,11 +32,10 @@ public class MainGenerator {
         Bukkit.getScheduler().runTaskAsynchronously(MazeGenerator.instance, () -> {
 
             final Location start = pVar.getPos1();
-
             final Location finish;
 
             if (pVar.getGenMode().equals(Mode.SLIM3x3)){
-                finish = plugin.utils.splitToThird(plugin.utils.devideLocation(start.clone(), pVar.getPos2()), start);
+                finish = plugin.utils.splitToThird(start.clone() , plugin.utils.devideLocation(start.clone(), pVar.getPos2()));
             }else {
                 finish = plugin.utils.devideLocation(start.clone(), pVar.getPos2());
             }

@@ -17,9 +17,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import sun.swing.ImageIconUIResource;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 
 public class MazeCommand implements CommandExecutor {
     public MazeGenerator plugin;
@@ -54,6 +52,7 @@ public class MazeCommand implements CommandExecutor {
             plugin.playerVars.add(pVar);
             pVar.setPlayer(player);
         }
+
 
 
 
