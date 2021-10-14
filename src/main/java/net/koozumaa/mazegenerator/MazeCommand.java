@@ -174,6 +174,7 @@ public class MazeCommand implements CommandExecutor {
                         return true;
                     }
                     player.sendMessage(MazeGenerator.commandPrefix + "Kuutiot sekunnissa asetettu arvoon §9" + pVar.getBps());
+                    break;
                 case "mode":
                     Optional<Mode> mode = Arrays.stream(Mode.values()).filter(gM -> gM.name().equalsIgnoreCase(args[1])).findFirst();
 

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 public final class MazeGenerator extends JavaPlugin {
     public static MazeGenerator instance;
-    //ArrayList<Points> pointList = new KoozuPair<Location, Location>();
     ArrayList<KoozuPair<Location, Location>> pointList = new ArrayList<>();
     public static String commandPrefix = "§f§lMoti§a§lMaze §8§l» §7";
     public ArrayList<Material> wallMaterials = new ArrayList<>();

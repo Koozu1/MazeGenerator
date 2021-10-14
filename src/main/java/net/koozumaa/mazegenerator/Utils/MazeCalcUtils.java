@@ -188,11 +188,7 @@ public class MazeCalcUtils {
     public ArrayList<Location> stretchTo3Times(final ArrayList<Location> locList, final Location startLoc){
         ArrayList<Location> stretchedLocs = new ArrayList<>();
         locList.forEach(loc -> {
-            //final Location locMid = loc.clone();
-            //locMid.add((locMid.getBlockX() - startLoc.clone().getBlockX()) * 3, 0, (locMid.getBlockZ() - startLoc.clone().getBlockZ()) * 3);
             Location locMid = startLoc.clone().add((loc.clone().getBlockX() - startLoc.clone().getBlockX()) * 3, 0, (loc.clone().getBlockZ() - startLoc.clone().getBlockZ()) * 3);
-            //locMid.setX((loc.getBlockX() - startLoc.getBlockX() * 3));
-            //locMid.setZ((loc.getBlockZ() - startLoc.getBlockZ() * 3));
             final Location arLoc1 = locMid.clone().add(1, 0, 1);
             final Location arLoc2 = locMid.clone().add(1, 0, 0);
             final Location arLoc3 = locMid.clone().add(1, 0, -1);
