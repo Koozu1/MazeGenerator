@@ -22,16 +22,12 @@ import java.util.*;
 public class MazeCommand implements CommandExecutor {
     public MazeGenerator plugin;
     Algorithm algorithm = new Algorithm(MazeGenerator.instance);
-    NewAlgorithm newAlgorithm = new NewAlgorithm(MazeGenerator.instance);
 
     public MazeCommand(MazeGenerator plugin) {
         this.plugin = plugin;
     }
 
-    int length = 0;
     String nullmsg;
-    //int blocksPerSecond = 2000;
-    //int blocksPerSecondStock = 2000;
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -70,14 +66,6 @@ public class MazeCommand implements CommandExecutor {
                     variableMessage(pVar);
                     break;
                 case "solve":
-                    /*
-                    if (algorithm.solution.isEmpty()){
-                        player.sendMessage(MazeGenerator.commandPrefix + "Generoi ensin labyrintti!");
-                        break;
-                    }
-                    algorithm.solution.forEach(loc -> loc.getBlock().setType(Material.BLUE_TERRACOTTA));
-
-                     */
                     algorithm.solveMaze(pVar.getPos1(), pVar.getPos2());
                     player.sendMessage(MazeGenerator.commandPrefix + "Ratkaistu");
                     break;
@@ -103,9 +91,6 @@ public class MazeCommand implements CommandExecutor {
 
                     pVar.setPos1(koozuPair.getKey());
                     pVar.setPos2(koozuPair.getValue());
-                    //algorithm.generate2(player, plugin.utils.toBlockLocation(koozuPair.getKey()), plugin.utils.toBlockLocation(koozuPair.getValue()));
-                    //newAlgorithm.calculateMaze(player, plugin.utils.toBlockLocation(koozuPair.getKey()),
-                            //plugin.utils.toBlockLocation(koozuPair.getValue()), pVar.getPos1().getWorld(), plugin.blocksPerSecond, plugin.genMode);
                     plugin.manager.genMaze(pVar);
                     break;
                 case "clearroofmaterials":

@@ -6,7 +6,7 @@ import net.koozumaa.mazegenerator.Utils.Mode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,17 +38,7 @@ public class TabCompleter implements org.bukkit.command.TabCompleter {
             }
             return results;
         }else if (args.length == 2){
-            /*
-            if (!args[0].equalsIgnoreCase("addmaterial") && !args[0].equalsIgnoreCase("removematerial")){
-                return null;
-            }
-            for (String a : arg2Results){
-                if (a.toLowerCase().startsWith(args[1].toLowerCase())){
-                    results.add(a);
-                }
-            }
 
-             */
             materialPair.getKey().forEach(arg0 ->{
                 if (arg0.toLowerCase().startsWith(args[0].toLowerCase())){
                     materialPair.getValue().forEach(arg1 ->{

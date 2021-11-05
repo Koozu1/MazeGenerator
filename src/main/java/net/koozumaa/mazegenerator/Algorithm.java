@@ -46,15 +46,7 @@ public class Algorithm {
 
                 }
             }
-            /*
-            if (!possibleLocsAround.isEmpty() && whereWasI.size() > 5) {
-                if (random.nextInt(5) == 1) {
-                    possibleLocsAround.clear();
-                }
 
-            }
-
-             */
             if (possibleLocsAround.isEmpty()) {
                 if (whereWasI.size() <= 1) {
                     break;

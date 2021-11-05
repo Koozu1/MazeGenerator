@@ -77,32 +77,6 @@ public class MainGenerator {
                     });
                     callback.accept(locList);
                     break;
-
-
-                    /*
-                    if (genMode.equals(Mode.SLIM3x3)){
-                        ArrayList<Location> newLocList = plugin.utils.stretchTo3Times(locList, start);
-                        locList.clear();
-                        locList.addAll(newLocList);
-                    }
-                    if (sendMsgs) {
-                        player.sendMessage(MazeGenerator.commandPrefix + "Labyrintin laskenta valmis. Lasketaan palikat!");
-                    }
-
-                    ArrayList<KoozuPair<Location, Material>> blocks = plugin.utils.countMazeBlocks(world, start, invertedLoc.getValue(), locList);
-                    if (sendMsgs) {
-                        player.sendMessage(MazeGenerator.commandPrefix + "Palikat laskettu, asetetaan palikat!");
-                    }
-                    if (genMode.equals(Mode.WORLDGEN)){
-                        plugin.genBlocks.clear();
-                        plugin.genBlocks.addAll(blocks);
-                        return;
-                    }
-
-                    plugin.utils.placeBlocks(blocks, blocksPerSecond,  world);
-                    break;
-
-                     */
                 }
             }
 
