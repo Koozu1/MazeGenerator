@@ -6,14 +6,14 @@ import net.koozumaa.mazegenerator.Tab.TabCompleter;
 import net.koozumaa.mazegenerator.Utils.MazeCalcUtils;
 import net.koozumaa.mazegenerator.Utils.PlayerVar;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 
 public final class MazeGenerator extends JavaPlugin {
     public static MazeGenerator instance;
     public static String commandPrefix = "§f§lMoti§a§lMaze §8§l» §7";
     public static String commandFormat = "command: /Maze [pos1, pos2, generate, variables]";
-    public ArrayList<PlayerVar> playerVars = new ArrayList<>();
+    public HashMap<UUID, PlayerVar> players = new HashMap<>();
 
     public int blocksPerSecondStock = 2000;
     public MazeCalcUtils utils;

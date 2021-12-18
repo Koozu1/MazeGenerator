@@ -5,10 +5,7 @@ import net.koozumaa.mazegenerator.Utils.KoozuPair;
 import net.koozumaa.mazegenerator.Utils.Mode;
 import net.koozumaa.mazegenerator.Utils.PlayerVar;
 import org.bukkit.*;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -25,7 +22,6 @@ public class MainGenerator {
      */
     Random rand = new Random();
 
-    ArrayList<KoozuPair<Chunk, ArrayList<Location>>> chunkLocList = new ArrayList<>();
     boolean sendMsgs = false;
     public void calculateMazeLocs(PlayerVar pVar, Consumer<ArrayList<Location>> callback) {
         ArrayList<Location> locList = new ArrayList<>();

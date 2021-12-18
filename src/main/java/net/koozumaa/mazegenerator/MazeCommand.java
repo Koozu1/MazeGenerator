@@ -14,7 +14,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.*;
 
 public class MazeCommand implements CommandExecutor {
@@ -32,23 +31,15 @@ public class MazeCommand implements CommandExecutor {
         nullmsg = "Missing variables: ";
         boolean isAnyNull = false;
         Player player = (Player) sender;
-        PlayerVar pVar = null;
+        PlayerVar pVar;
 
-        for (PlayerVar playerVar : plugin.playerVars){
-            if (playerVar.getUUID().equals(player)){
-                pVar = playerVar;
-            }
-        }
-
-        if (pVar == null){
-            Bukkit.getConsoleSender().sendMessage("moi");
+        if(plugin.players.containsKey(player.getUniqueId())){
+            pVar = plugin.players.get(player.getUniqueId());
+        }else {
             pVar = new PlayerVar();
-            plugin.playerVars.add(pVar);
             pVar.setUUID(player.getUniqueId());
+            plugin.players.put(player.getUniqueId(), pVar);
         }
-
-
-
 
         if (args.length == 1) {
             switch (args[0].toLowerCase()) {

@@ -3,11 +3,8 @@ package net.koozumaa.mazegenerator;
 import net.koozumaa.mazegenerator.Utils.KoozuPair;
 import net.koozumaa.mazegenerator.Utils.MazeCalcUtils;
 import org.bukkit.*;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class Solver {
