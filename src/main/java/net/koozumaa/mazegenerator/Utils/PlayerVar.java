@@ -3,16 +3,14 @@ package net.koozumaa.mazegenerator.Utils;
 import net.koozumaa.mazegenerator.MazeGenerator;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class PlayerVar {
 
-    Player player = null;
-    public Player getPlayer() { return player; }
-    public void setPlayer(Player player) { this.player = player; }
+    UUID uuid = null;
+    public UUID getUUID() { return uuid; }
+    public void setUUID(UUID uuid) {this.uuid = uuid;}
 
     Location pos1 = null;
     public Location getPos1() { return pos1; }
