@@ -49,9 +49,6 @@ public class MainGenerator {
 
             while (true) {
                 ArrayList<Location> possibleLocs = plugin.utils.getPossibleBlocksAround(iAmHere, start, finish, visitedLocs);
-                //rand.setSeed(plugin.utils.randSeed(iAmHere.getBlockX(), iAmHere.getBlockZ()));
-                //rand.setSeed(plugin.utils.getRandomSeed(rand.nextDouble()));
-
                 if (possibleLocs.isEmpty()) {
                     if (whereWasI.size() <= 1) {
                         break;

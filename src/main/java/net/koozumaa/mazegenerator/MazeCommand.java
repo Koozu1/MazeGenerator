@@ -9,19 +9,17 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import sun.swing.ImageIconUIResource;
 
 import java.util.*;
 
 public class MazeCommand implements CommandExecutor {
     public MazeGenerator plugin;
-    Algorithm algorithm = new Algorithm(MazeGenerator.instance);
+    Solver solver = new Solver(MazeGenerator.instance);
 
     public MazeCommand(MazeGenerator plugin) {
         this.plugin = plugin;
@@ -37,7 +35,7 @@ public class MazeCommand implements CommandExecutor {
         PlayerVar pVar = null;
 
         for (PlayerVar playerVar : plugin.playerVars){
-            if (playerVar.getPlayer().equals(player)){
+            if (playerVar.getUUID().equals(player)){
                 pVar = playerVar;
             }
         }
@@ -46,7 +44,7 @@ public class MazeCommand implements CommandExecutor {
             Bukkit.getConsoleSender().sendMessage("moi");
             pVar = new PlayerVar();
             plugin.playerVars.add(pVar);
-            pVar.setPlayer(player);
+            pVar.setUUID(player.getUniqueId());
         }
 
 
@@ -66,7 +64,7 @@ public class MazeCommand implements CommandExecutor {
                     variableMessage(pVar);
                     break;
                 case "solve":
-                    algorithm.solveMaze(pVar.getPos1(), pVar.getPos2());
+                    solver.solveMaze(pVar.getPos1(), pVar.getPos2());
                     player.sendMessage(MazeGenerator.commandPrefix + "Ratkaistu");
                     break;
                 case "generate":
@@ -87,7 +85,7 @@ public class MazeCommand implements CommandExecutor {
                         player.sendMessage(MazeGenerator.commandPrefix + "Alueen reunojen on oltavat parilliset");
                         return true;
                     }
-                    KoozuPair<Location, Location> koozuPair = plugin.utils.getInvertedLocations(pVar.getPos1(), pVar.getPos2(), pVar.getPlayer().getWorld());
+                    KoozuPair<Location, Location> koozuPair = plugin.utils.getInvertedLocations(pVar.getPos1(), pVar.getPos2(), Bukkit.getPlayer(pVar.getUUID()).getWorld());
 
                     pVar.setPos1(koozuPair.getKey());
                     pVar.setPos2(koozuPair.getValue());
@@ -201,7 +199,7 @@ public class MazeCommand implements CommandExecutor {
 
 
     public void variableMessage(PlayerVar pVar) {
-        Player player = pVar.getPlayer();
+        Player player = Bukkit.getPlayer(pVar.getUUID());
         player.sendMessage(MazeGenerator.commandPrefix + "Muuttujat:");
         if (pVar.getPos1() == null){
             player.sendMessage("§9| §7pos1 = §5null");

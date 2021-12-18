@@ -142,7 +142,7 @@ public class MazeCalcUtils {
     Random random = new Random();
     public ArrayList<KoozuPair<Location, Material>> countMazeBlocks(PlayerVar pVar,  ArrayList<Location> locations) {
         ArrayList<KoozuPair<Location, Material>> blocks = new ArrayList<>();
-        World world = pVar.getPlayer().getWorld();
+        World world = Bukkit.getPlayer(pVar.getUUID()).getWorld();
         Location pos1 = pVar.getPos1();
         Location pos2 = pVar.getPos2();
 

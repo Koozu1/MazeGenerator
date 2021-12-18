@@ -22,7 +22,7 @@ public class GenManager {
     public void genMaze(final PlayerVar pVar) {
         final Location nPos1 = pVar.getPos1();
         final Location nPos2 = pVar.getPos2();
-        Player player = pVar.getPlayer();
+        Player player = Bukkit.getPlayer(pVar.getUUID());
         World world = player.getWorld();
         Mode genMode = pVar.getGenMode();
         boolean sendMsg = pVar.isSendMessages();
