@@ -26,6 +26,8 @@ public class GenManager {
         boolean sendMsg = pVar.isSendMessages();
         int bps = pVar.getBps();
 
+        boolean useApi = true;
+
 
         plugin.mainGenerator.calculateMazeLocs(pVar, locations -> {
             Bukkit.broadcastMessage("Donecalc");
