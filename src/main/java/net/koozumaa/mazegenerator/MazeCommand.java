@@ -45,18 +45,18 @@ public class MazeCommand implements CommandExecutor {
             switch (args[0].toLowerCase()) {
                 case "pos1":
                     pVar.setPos1(plugin.utils.toBlockLocation(player.getLocation().getBlock().getLocation()));
-                    player.sendMessage(MazeGenerator.commandPrefix + "Sijainti 1 asetettu");
+                    player.sendMessage(MazeGenerator.commandPrefix + "Position 1 set");
                     break;
                 case "pos2":
                     pVar.setPos2(plugin.utils.toBlockLocation(player.getLocation().getBlock().getLocation()));
-                    player.sendMessage(MazeGenerator.commandPrefix + "Sijainti 2 asetettu");
+                    player.sendMessage(MazeGenerator.commandPrefix + "Position 2 set");
                     break;
                 case "variables":
                     variableMessage(pVar);
                     break;
                 case "solve":
                     solver.solveMaze(pVar.getPos1(), pVar.getPos2());
-                    player.sendMessage(MazeGenerator.commandPrefix + "Ratkaistu");
+                    player.sendMessage(MazeGenerator.commandPrefix + "Solved");
                     break;
                 case "generate":
                     if (pVar.getPos1() == null) {
@@ -73,7 +73,7 @@ public class MazeCommand implements CommandExecutor {
                     }
 
                     if (!isEvenLocation(pVar.getPos1(), pVar.getPos2())) {
-                        player.sendMessage(MazeGenerator.commandPrefix + "Alueen reunojen on oltavat parilliset");
+                        player.sendMessage(MazeGenerator.commandPrefix + "Lengths should be divisible by two");
                         return true;
                     }
                     KoozuPair<Location, Location> koozuPair = plugin.utils.getInvertedLocations(pVar.getPos1(), pVar.getPos2(), Bukkit.getPlayer(pVar.getUUID()).getWorld());
@@ -84,26 +84,26 @@ public class MazeCommand implements CommandExecutor {
                     break;
                 case "clearroofmaterials":
                     if (pVar.getRoofMaterials().isEmpty()){
-                        player.sendMessage(MazeGenerator.commandPrefix + "Katon materiaalit olivat jo tyhjät!");
+                        player.sendMessage(MazeGenerator.commandPrefix + "Roof materials are already empty");
                         break;
                     }
-                    player.sendMessage(MazeGenerator.commandPrefix + "Tyhjennetty katon materiaalit!");
+                    player.sendMessage(MazeGenerator.commandPrefix + "Cleared roof materials");
                     pVar.setRoofMaterials(new ArrayList<>());
                     break;
                 case "clearwallmaterials":
                     if (pVar.getWallMaterials().isEmpty()){
-                        player.sendMessage(MazeGenerator.commandPrefix + "Seinien materiaalit olivat jo tyhjät!");
+                        player.sendMessage(MazeGenerator.commandPrefix + "Wall materials are already empty");
                         break;
                     }
-                    player.sendMessage(MazeGenerator.commandPrefix + "Tyhjennetty seinien materiaalit!");
+                    player.sendMessage(MazeGenerator.commandPrefix + "Cleared wall materials");
                     pVar.setWallMaterials(new ArrayList<>());
                     break;
                 case "clearfloormaterials":
                     if (pVar.getFloorMaterials().isEmpty()){
-                        player.sendMessage(MazeGenerator.commandPrefix + "Lattian materiaalit olivat jo tyhjät!");
+                        player.sendMessage(MazeGenerator.commandPrefix + "Floor materials are already empty");
                         break;
                     }
-                    player.sendMessage(MazeGenerator.commandPrefix + "Tyhjennetty lattian materiaalit!");
+                    player.sendMessage(MazeGenerator.commandPrefix + "Cleared floor materials");
                     pVar.setFloorMaterials(new ArrayList<>());
                     break;
             }
@@ -112,7 +112,7 @@ public class MazeCommand implements CommandExecutor {
             Material mainHandMaterial = player.getInventory().getItemInMainHand().getType();
             switch (args[0].toLowerCase()) {
                 case "addmaterial":
-                    player.sendMessage(MazeGenerator.commandPrefix + "Lisätty materiaali: §9" + mainHandMaterial);
+                    player.sendMessage(MazeGenerator.commandPrefix + "Added material: §9" + mainHandMaterial);
                     switch (args[1].toLowerCase()) {
                         case "roof":
                             pVar.addRoofMaterial(mainHandMaterial);
@@ -126,7 +126,7 @@ public class MazeCommand implements CommandExecutor {
                     }
                     break;
                 case "removeMaterial":
-                    player.sendMessage(MazeGenerator.commandPrefix + "Poistettu materiaali: §9" + mainHandMaterial);
+                    player.sendMessage(MazeGenerator.commandPrefix + "Removed material: §9" + mainHandMaterial);
                     switch (args[1].toLowerCase()) {
                         case "roof":
                             pVar.getRoofMaterials().remove(mainHandMaterial);
@@ -143,31 +143,31 @@ public class MazeCommand implements CommandExecutor {
                     try {
                         pVar.setBps(Integer.parseInt(args[1]));
                     }catch (NumberFormatException exception){
-                        player.sendMessage(MazeGenerator.commandPrefix + args[1] + " ei ole numero! Asetettu vakioksi §9" + plugin.blocksPerSecondStock);
+                        player.sendMessage(MazeGenerator.commandPrefix + args[1] + " is not a number! Changed to default §9" + plugin.blocksPerSecondStock);
                         pVar.setBps(plugin.blocksPerSecondStock);
                         return true;
                     }
-                    player.sendMessage(MazeGenerator.commandPrefix + "Kuutiot sekunnissa asetettu arvoon §9" + pVar.getBps());
+                    player.sendMessage(MazeGenerator.commandPrefix + "Blocks per second changed to §9" + pVar.getBps());
                     break;
                 case "mode":
                     Optional<Mode> mode = Arrays.stream(Mode.values()).filter(gM -> gM.name().equalsIgnoreCase(args[1])).findFirst();
 
                     if (!mode.isPresent()){
-                        player.sendMessage(MazeGenerator.commandPrefix + "Tätä tilaa ei ole olemassa.");
+                        player.sendMessage(MazeGenerator.commandPrefix + "This mode doesn't exist");
                         break;
                     }
                     pVar.setGenMode(mode.get());
-                    player.sendMessage(MazeGenerator.commandPrefix + pVar.getGenMode().name() + "-tila asetettu");
+                    player.sendMessage(MazeGenerator.commandPrefix + pVar.getGenMode().name() + "-mode set");
                     break;
                 case "api":
                     if (args[1].toLowerCase().equals("true")){
-                        player.sendMessage(MazeGenerator.commandPrefix + "Käytetään apia!");
+                        player.sendMessage(MazeGenerator.commandPrefix + "Using api now");
                         pVar.setApi(true);
                     }else if (args[1].toLowerCase().equals("false")){
-                        player.sendMessage(MazeGenerator.commandPrefix + "Api poistettu käytöstä!");
+                        player.sendMessage(MazeGenerator.commandPrefix + "Not using api now");
                         pVar.setApi(false);
                     }else {
-                        player.sendMessage(MazeGenerator.commandPrefix + "Api " + (pVar.isApi() ? "ei" : "on") + " käytössä!");
+                        player.sendMessage(MazeGenerator.commandPrefix + "Api " + (pVar.isApi() ? "not" : "is") + " in use");
                     }
 
             }
@@ -202,7 +202,7 @@ public class MazeCommand implements CommandExecutor {
 
     public void variableMessage(PlayerVar pVar) {
         Player player = Bukkit.getPlayer(pVar.getUUID());
-        player.sendMessage(MazeGenerator.commandPrefix + "Muuttujat:");
+        player.sendMessage(MazeGenerator.commandPrefix + "Variables:");
         if (pVar.getPos1() == null){
             player.sendMessage("§9| §7pos1 = §5null");
         }else {
@@ -213,22 +213,22 @@ public class MazeCommand implements CommandExecutor {
         }else {
             player.sendMessage("§9| §7pos2 = §9" + pVar.getPos2().getBlockX() + "x, " + pVar.getPos2().getBlockY() + "y, " + pVar.getPos2().getBlockZ() + "z");
         }
-        player.sendMessage("§9| §7Palikoita sekunissa: §9" + pVar.getBps());
+        player.sendMessage("§9| §7Blocks per second: §9" + pVar.getBps());
 
-        String roofMat = "§9| [Katon materiaalit]";
-        String roofTitle = "§9Katon materiaalit:§7";
+        String roofMat = "§9| [Roof materials]";
+        String roofTitle = "§9Roof materials:§7";
         TextComponent roofComponent = new TextComponent(roofMat);
         roofComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(getMaterialString(pVar.getRoofMaterials(), roofTitle)).create()));
         player.spigot().sendMessage(roofComponent);
 
-        String wallMat = "§9| [Seinien materiaalit]";
-        String wallTitle = "§9Seinien materiaalit:§7";
+        String wallMat = "§9| [Wall materials]";
+        String wallTitle = "§9Wall materials:§7";
         TextComponent wallComponent = new TextComponent(wallMat);
         wallComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(getMaterialString(pVar.getWallMaterials(), wallTitle)).create()));
         player.spigot().sendMessage(wallComponent);
 
-        String floorMat = "§9| [Lattian materiaalit]";
-        String floorTitle = "§9Lattian materiaalit:§7";
+        String floorMat = "§9| [Floor materials]";
+        String floorTitle = "§9Floor materials:§7";
         TextComponent floorComponent = new TextComponent(floorMat);
         floorComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(getMaterialString(pVar.getFloorMaterials(), floorTitle)).create()));
         player.spigot().sendMessage(floorComponent);
