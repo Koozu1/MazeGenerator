@@ -159,6 +159,17 @@ public class MazeCommand implements CommandExecutor {
                     pVar.setGenMode(mode.get());
                     player.sendMessage(MazeGenerator.commandPrefix + pVar.getGenMode().name() + "-tila asetettu");
                     break;
+                case "api":
+                    if (args[1].toLowerCase().equals("true")){
+                        player.sendMessage(MazeGenerator.commandPrefix + "Käytetään apia!");
+                        pVar.setApi(true);
+                    }else if (args[1].toLowerCase().equals("false")){
+                        player.sendMessage(MazeGenerator.commandPrefix + "Api poistettu käytöstä!");
+                        pVar.setApi(false);
+                    }else {
+                        player.sendMessage(MazeGenerator.commandPrefix + "Api " + (pVar.isApi() ? "ei" : "on") + " käytössä!");
+                    }
+
             }
         }
         return true;

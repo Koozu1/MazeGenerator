@@ -3,10 +3,10 @@ package net.koozumaa.mazegenerator.Generators;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import jdk.jfr.ContentType;
 import net.koozumaa.mazegenerator.MazeGenerator;
-import net.koozumaa.mazegenerator.Utils.KoozuPair;
-import net.koozumaa.mazegenerator.Utils.Mode;
-import net.koozumaa.mazegenerator.Utils.PlayerVar;
+import net.koozumaa.mazegenerator.Utils.*;
 import org.bukkit.*;
 
 import java.io.IOException;
@@ -33,12 +33,13 @@ public class MainGenerator {
 
     boolean sendMsgs = false;
     public void calculateMazeLocs(PlayerVar pVar, Consumer<ArrayList<Location>> callback) {
-        boolean useApi = true;
+
         ArrayList<Location> locList = new ArrayList<>();
         Bukkit.getScheduler().runTaskAsynchronously(MazeGenerator.instance, () -> {
-            if (useApi){
+            if (pVar.isApi()){
                 try {
                     callback.accept(requestApi(pVar));
+                    return;
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
@@ -97,22 +98,32 @@ public class MainGenerator {
 
     public ArrayList<Location> requestApi(PlayerVar pVar) throws JsonProcessingException {
         try {
-            var pair = new KoozuPair<>(pVar.getPos1(), pVar.getPos2());
+            KoozuPair<MLocation, MLocation> pair = new KoozuPair<>(new MLocation(pVar.getPos1().getBlockX(), pVar.getPos1().getBlockY(), pVar.getPos1().getBlockZ()),
+                    new MLocation(pVar.getPos2().getBlockX(), pVar.getPos2().getBlockY(), pVar.getPos2().getBlockZ()));
             var objectMapper = new ObjectMapper();
             String requestBody = objectMapper
                     .writeValueAsString(pair);
 
+            //HTTP client instance & request build & send
             HttpClient httpClient = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("http://86.60.197.61:8080/posttest"))
+                    .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
             HttpResponse<String> response = httpClient.send(request,
                     HttpResponse.BodyHandlers.ofString());
+
+            //register deserializer to obj map inst
+            SimpleModule module = new SimpleModule();
+            module.addDeserializer(Location.class, new LocationJsonDeserializer());
+            objectMapper.registerModule(module);
+
+            //convert json -> java object && prep for Bukkit api
             ArrayList<Location> locs = objectMapper.readValue(response.body(), new TypeReference<>() {});
             locs.forEach(loc ->{
-                loc.setWorld(pVar.getPos1().getWorld());
+                loc.setWorld(Bukkit.getWorld(pVar.getPos1().getWorld().getName()));
                 loc.setY(pVar.getPos1().getBlockY());
             });
             return locs;

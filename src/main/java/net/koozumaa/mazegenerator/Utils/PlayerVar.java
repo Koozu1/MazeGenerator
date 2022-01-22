@@ -47,5 +47,16 @@ public class PlayerVar {
     public void setFloorMaterials(ArrayList<Material> floorMaterials) { this.floorMaterials = floorMaterials; }
     public void addFloorMaterial(Material material){this.floorMaterials.add(material);}
 
+    public boolean isApi() {
+        return api;
+    }
+
+    public void setApi(boolean api) {
+        this.api = api;
+    }
+
+    boolean api = true;
+
+
 
 }
