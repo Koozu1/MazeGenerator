@@ -14,6 +14,9 @@ public enum Mode {
     WORLDGEN{
         public String toString(){return this.name();}
     },
+    WORLDEDIT{
+        public String toString(){return this.name();}
+    },
     CUSTOM{
         public String toString(){return this.name();}
 

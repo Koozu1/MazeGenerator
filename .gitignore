@@ -4,6 +4,8 @@
 *.iml
 *.ipr
 *.iws
+#CLICKLISTENER
+src/main/java/net/koozumaa/mazegenerator/Clicklistener.java
 
 # IntelliJ
 out/

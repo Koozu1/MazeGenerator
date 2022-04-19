@@ -36,8 +36,7 @@ public class MazeCommand implements CommandExecutor {
         if(plugin.players.containsKey(player.getUniqueId())){
             pVar = plugin.players.get(player.getUniqueId());
         }else {
-            pVar = new PlayerVar();
-            pVar.setUUID(player.getUniqueId());
+            pVar = new PlayerVar(player.getUniqueId());
             plugin.players.put(player.getUniqueId(), pVar);
         }
 

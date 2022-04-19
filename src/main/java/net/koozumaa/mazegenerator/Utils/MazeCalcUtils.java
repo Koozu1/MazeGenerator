@@ -1,8 +1,19 @@
 package net.koozumaa.mazegenerator.Utils;
 
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.internal.annotation.Selection;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import net.koozumaa.mazegenerator.MazeGenerator;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +61,14 @@ public class MazeCalcUtils {
         return false;
     }
 
+    public boolean isInWorldEditRegion(Location location, PlayerVar pVar, WorldEditPlugin we) throws IncompleteRegionException {
+        Player p = Bukkit.getPlayer(pVar.getUUID());
+
+        Region reg = we.getSession(p).getSelection(BukkitAdapter.adapt(location.getWorld()));
+
+        return( reg.contains(BlockVector3.at(location.getX(), location.getY(), location.getZ())));
+    }
+
     //Devides pos2 to 1/4 of original surface area
     public Location devideLocation(final Location pos1, final Location pos2) {
         return pos1.clone().add((pos2.getBlockX() - pos1.getBlockX()) / 2, 0, (pos2.getBlockZ() - pos1.getBlockZ()) / 2);
@@ -76,11 +95,58 @@ public class MazeCalcUtils {
         ArrayList<Location> locs = getBlocksAround(loc);
         ArrayList<Location> pLocs = new ArrayList<>();
         locs.forEach(location -> {
+
+
             if (isInRegion(location, pos1, pos2) && !isVisited(location, visitedLocs)) {
                 pLocs.add(location);
             }
         });
         return pLocs;
+    }
+
+    // devide jakaa kahteen, tämä ei, siksi error.
+    public ArrayList<Location> getPossibleBlocksAroundWorldEditRegion(Location loc, PlayerVar pVar, ArrayList<Location> visitedLocs) {
+        ArrayList<Location> locs = getBlocksAround(loc);
+        ArrayList<Location> pLocs = new ArrayList<>();
+
+        locs.forEach(location -> {
+            try {
+                if (isInWorldEditRegion(location, pVar, plugin.worldEditPlugin) && !isVisited(location, visitedLocs)) {
+                    pLocs.add(location);
+                }
+            } catch (IncompleteRegionException e) {
+                Bukkit.getPlayer(pVar.getUUID()).sendMessage("WORLD GUARD RIKKI VELI");
+                e.printStackTrace();
+            }
+        });
+        return pLocs;
+    }
+
+    public boolean checkIfPossibleLoc(Location loc, Location before, ArrayList<Location> visitedLocs){
+        // loc left, bef right
+        ArrayList<Location> locs = getBlocksAround(loc);
+
+        int near = (int) locs.stream().filter(location -> isVisited(location, visitedLocs)).count();
+        if (near > 1){
+            return false;
+        }
+        Location subLoc = loc.clone().add(loc.clone().subtract(before));
+
+        if (subLoc.getBlockZ() + subLoc.getBlockX() != 1){
+            Bukkit.broadcast(Component.text(loc + " <----> " + before));
+        }
+
+        BlockFace bf = before.getBlock().getFace(loc.getBlock());
+        Vector vec = bf.getDirection().rotateAroundY(Math.PI * 1/2);
+
+        if (visitedLocs.contains(subLoc.clone().add(vec))){
+            return false;
+        }
+            vec.rotateAroundY(Math.PI);
+        if (visitedLocs.contains(subLoc.clone().add(vec))){
+            return false;
+        }
+        return true;
     }
 
     //Place blocks with defined amount of blocks per second

@@ -4,6 +4,7 @@ import net.koozumaa.mazegenerator.MazeGenerator;
 import net.koozumaa.mazegenerator.Utils.KoozuPair;
 import net.koozumaa.mazegenerator.Utils.PlayerVar;
 import net.koozumaa.mazegenerator.Utils.Mode;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,9 +27,21 @@ public class GenManager {
         boolean sendMsg = pVar.isSendMessages();
         int bps = pVar.getBps();
 
+        if (genMode == Mode.WORLDEDIT){
+            plugin.mainGenerator.calculateMazeLocs(pVar, plugin.worldEditPlugin, locations -> {
+                Bukkit.broadcast(Component.text("DONEEE YEEA" + locations.size()));
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    locations.forEach(loc -> loc.getBlock().setType(Material.BLUE_TERRACOTTA));
+                });
+            });
+
+
+            return;
+        }
+
 
         plugin.mainGenerator.calculateMazeLocs(pVar, locations -> {
-            Bukkit.broadcastMessage("Donecalc");
+
             ArrayList<KoozuPair<Location, Material>> blocks;
             switch (genMode) {
                 case NORMAL:
