@@ -180,6 +180,7 @@ public class MazeCalcUtils {
         });
     }
 
+
     //When stretching, multiply pairs to corects size and add wall inbetween
     public ArrayList<Location> multiplyLocations(final Location pos1, final Location pos2, final Location mazeStartLocation) {
         Location mPos1 = pos1.clone();
@@ -242,6 +243,33 @@ public class MazeCalcUtils {
         }
         return blocks;
     }
+    public ArrayList<KoozuPair<Location, Material>> countMazeBlocks(PlayerVar pVar,  ArrayList<Location> locations, WorldEditPlugin we) throws IncompleteRegionException {
+        ArrayList<KoozuPair<Location, Material>> blocks = new ArrayList<>();
+        Player player = Bukkit.getPlayer(pVar.getUUID());
+        World world = locations.get(0).getWorld();
+        Region region = we.getSession(player).getSelection(BukkitAdapter.adapt(world));
+        region.polygonize(-1).forEach(blockVector2 -> {
+            if (locations.contains(new Location(world, blockVector2.getX(), 2, blockVector2.getBlockZ())));
+        });
+        var polygonized =  region.polygonize(-1);
+
+        int min = region.getMinimumPoint().getBlockY();
+        int max = region.getMaximumPoint().getBlockY();
+        for (int i = min; i < max; i++){
+            if (i == min){
+                Location polyLoc =  new Location(world, polygonized.get(i).getX(), 2, polygonized.get(i).getZ());
+                if (locations.remove(polyLoc)){
+
+                }
+
+            }
+
+        }
+
+
+
+    }
+
 
     public ArrayList<Location> stretchTo3Times(final ArrayList<Location> locList, final Location startLoc){
         ArrayList<Location> stretchedLocs = new ArrayList<>();

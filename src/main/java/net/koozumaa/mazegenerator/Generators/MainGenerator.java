@@ -4,6 +4,7 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import net.koozumaa.mazegenerator.MazeGenerator;
 import net.koozumaa.mazegenerator.Utils.KoozuPair;
 import net.koozumaa.mazegenerator.Utils.Mode;
@@ -97,8 +98,13 @@ public class MainGenerator {
             Player player = Bukkit.getPlayer(pVar.getUUID());
             Location start = null;
             try {
-                BlockVector3 bvec = we.getSession(player).getSelection(BukkitAdapter.adapt(player.getWorld())).getBoundingBox().getPos1();
-                start = new Location(player.getWorld(), bvec.getX(), bvec.getY(), bvec.getZ());
+                Region region = we.getSession(player).getSelection(BukkitAdapter.adapt(player.getWorld()));
+                if (!region.contains(BlockVector3.at(pVar.getPos1().getBlockX(), pVar.getPos1().getBlockY(), pVar.getPos1().getBlockZ()))){
+                    player.sendMessage(MazeGenerator.commandPrefix + "Pos1 not in World Edit selection!");
+                    callback.accept(null);
+                    return;
+                }
+                start = pVar.getPos1();
             } catch (IncompleteRegionException e) {
                 e.printStackTrace();
             }
@@ -140,8 +146,11 @@ public class MainGenerator {
                         });
 
                          */
+                        Location finalStart = start;
                         points.forEach(p -> {
-                            locList.add(p.getValue());
+                            Location locWithYChange = p.getValue();
+                            locWithYChange.setY(finalStart.getY());
+                            locList.add(locWithYChange);
                         });
 
                         callback.accept(locList);

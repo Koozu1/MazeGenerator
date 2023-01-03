@@ -62,7 +62,7 @@ public class MazeCommand implements CommandExecutor {
                         nullmsg += "pos1,";
                         isAnyNull = true;
                     }
-                    if (pVar.getPos2() == null) {
+                    if (pVar.getGenMode() != Mode.WORLDEDIT && pVar.getPos2() == null) {
                         nullmsg += "pos2,";
                         isAnyNull = true;
                     }
@@ -71,14 +71,16 @@ public class MazeCommand implements CommandExecutor {
                         return true;
                     }
 
-                    if (!isEvenLocation(pVar.getPos1(), pVar.getPos2())) {
+                    if (pVar.getGenMode() != Mode.WORLDEDIT && !isEvenLocation(pVar.getPos1(), pVar.getPos2())) {
                         player.sendMessage(MazeGenerator.commandPrefix + "Alueen reunojen on oltavat parilliset");
                         return true;
                     }
-                    KoozuPair<Location, Location> koozuPair = plugin.utils.getInvertedLocations(pVar.getPos1(), pVar.getPos2(), Bukkit.getPlayer(pVar.getUUID()).getWorld());
+                    if (pVar.getGenMode() != Mode.WORLDEDIT) {
+                        KoozuPair<Location, Location> koozuPair = plugin.utils.getInvertedLocations(pVar.getPos1(), pVar.getPos2(), Bukkit.getPlayer(pVar.getUUID()).getWorld());
 
-                    pVar.setPos1(koozuPair.getKey());
-                    pVar.setPos2(koozuPair.getValue());
+                        pVar.setPos1(koozuPair.getKey());
+                        pVar.setPos2(koozuPair.getValue());
+                    }
                     plugin.manager.genMaze(pVar);
                     break;
                 case "clearroofmaterials":
