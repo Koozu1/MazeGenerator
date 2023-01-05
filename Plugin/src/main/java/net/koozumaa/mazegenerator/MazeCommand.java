@@ -2,7 +2,7 @@ package net.koozumaa.mazegenerator;
 
 import net.koozumaa.mazegenerator.Utils.KoozuPair;
 import net.koozumaa.mazegenerator.Utils.PlayerVar;
-import net.koozumaa.mazegenerator.Utils.Mode;
+import net.koozumaa.mazeapi.Mode;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;

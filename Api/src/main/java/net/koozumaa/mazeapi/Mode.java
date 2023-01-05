@@ -1,6 +1,6 @@
-package net.koozumaa.mazegenerator.Utils;
+package net.koozumaa.mazeapi;
 
-public enum Mode {
+public enum Mode{
     NORMAL{
         public String toString(){
             return this.name();

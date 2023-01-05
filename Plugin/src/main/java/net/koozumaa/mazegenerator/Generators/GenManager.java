@@ -1,34 +1,41 @@
 package net.koozumaa.mazegenerator.Generators;
 
+import net.koozumaa.mazeapi.iPlayerVar;
 import net.koozumaa.mazegenerator.MazeGenerator;
 import net.koozumaa.mazegenerator.Utils.KoozuPair;
+import net.koozumaa.mazeapi.Mode;
 import net.koozumaa.mazegenerator.Utils.PlayerVar;
-import net.koozumaa.mazegenerator.Utils.Mode;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import net.koozumaa.mazeapi.iMazeApi;
+
 import java.util.ArrayList;
 
-public class GenManager {
+public class GenManager implements iMazeApi {
     public MazeGenerator plugin;
 
     public GenManager(MazeGenerator plugin) {
         this.plugin = plugin;
     }
 
-
-    public void genMaze(final PlayerVar pVar) {
+    @Override
+    public void genMaze(iPlayerVar pVar) {
         Player player = Bukkit.getPlayer(pVar.getUUID());
-        World world = player.getWorld();
+        World world;
+        if(pVar.getUUID() == null){
+            world = pVar.getWorld();
+        }else {
+            world = player.getWorld();
+        }
+
         Mode genMode = pVar.getGenMode();
         boolean sendMsg = pVar.isSendMessages();
         int bps = pVar.getBps();
 
-
         plugin.mainGenerator.calculateMazeLocs(pVar, locations -> {
-            Bukkit.broadcastMessage("Donecalc");
             ArrayList<KoozuPair<Location, Material>> blocks;
             switch (genMode) {
                 case NORMAL:
@@ -58,6 +65,10 @@ public class GenManager {
         });
     }
 
+    @Override
+    public iPlayerVar createPlayerVar(Location pos1, Location pos2, int bps, Mode genMode, boolean sendMessages, ArrayList<Material> roofMaterials, ArrayList<Material> wallMaterials, ArrayList<Material> floorMaterials, World world) {
+        return new PlayerVar(pos1, pos2, bps, genMode, sendMessages, roofMaterials, wallMaterials, floorMaterials, world);
+    }
 
     //Messages
     public void sendCountDoneMessage(Player player, boolean sendmsg) {

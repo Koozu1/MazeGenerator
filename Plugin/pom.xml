@@ -2,25 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>MazeGenerator</artifactId>
+        <groupId>net.koozumaa</groupId>
+        <version>1</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.koozumaa</groupId>
-    <artifactId>MazeGenerator</artifactId>
+    <artifactId>Plugin</artifactId>
     <version>1</version>
-    <modules>
-        <module>Api</module>
-        <module>Plugin</module>
-    </modules>
-    <packaging>pom</packaging>
-
-    <name>MazeGenerator</name>
-
-    <properties>
-        <java.version>1.8</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <build>
+        <finalName>MazeGenerator-${version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -48,36 +40,25 @@
                 </executions>
             </plugin>
         </plugins>
-
+        <resources>
+            <resource>
+                <directory>src/main/resources/</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
-
-    <repositories>
-        <repository>
-            <id>papermc</id>
-            <url>https://papermc.io/repo/repository/maven-public/</url>
-        </repository>
-        <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>enginehub-maven</id>
-            <url>https://maven.enginehub.org/repo/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.18.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>7.2.0-SNAPSHOT</version>
-            <scope>provided</scope>
+            <groupId>net.koozumaa</groupId>
+            <artifactId>Api</artifactId>
+            <version>1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
+
+
+    <properties>
+        <maven.compiler.source>18</maven.compiler.source>
+        <maven.compiler.target>18</maven.compiler.target>
+    </properties>
 </project>

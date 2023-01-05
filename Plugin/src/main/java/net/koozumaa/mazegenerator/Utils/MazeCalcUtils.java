@@ -1,5 +1,6 @@
 package net.koozumaa.mazegenerator.Utils;
 
+import net.koozumaa.mazeapi.iPlayerVar;
 import net.koozumaa.mazegenerator.MazeGenerator;
 import org.bukkit.*;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -140,9 +141,14 @@ public class MazeCalcUtils {
     //Get the placeble blocks in the maze. Roof, Floor, Walls
     //TODO: Outer walls
     Random random = new Random();
-    public ArrayList<KoozuPair<Location, Material>> countMazeBlocks(PlayerVar pVar,  ArrayList<Location> locations) {
+    public ArrayList<KoozuPair<Location, Material>> countMazeBlocks(iPlayerVar pVar, ArrayList<Location> locations) {
         ArrayList<KoozuPair<Location, Material>> blocks = new ArrayList<>();
-        World world = Bukkit.getPlayer(pVar.getUUID()).getWorld();
+        World world;
+        if(pVar.getUUID() == null){
+            world = pVar.getWorld();
+        }else {
+            world = Bukkit.getPlayer(pVar.getUUID()).getWorld();
+        }
         Location pos1 = pVar.getPos1();
         Location pos2 = pVar.getPos2();
 

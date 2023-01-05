@@ -2,7 +2,7 @@ package net.koozumaa.mazegenerator.Tab;
 
 import net.koozumaa.mazegenerator.MazeGenerator;
 import net.koozumaa.mazegenerator.Utils.KoozuPair;
-import net.koozumaa.mazegenerator.Utils.Mode;
+import net.koozumaa.mazeapi.Mode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

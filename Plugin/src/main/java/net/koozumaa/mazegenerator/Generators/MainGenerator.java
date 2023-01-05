@@ -1,29 +1,29 @@
 package net.koozumaa.mazegenerator.Generators;
 
+import net.koozumaa.mazeapi.iPlayerVar;
 import net.koozumaa.mazegenerator.MazeGenerator;
 import net.koozumaa.mazegenerator.Utils.KoozuPair;
-import net.koozumaa.mazegenerator.Utils.Mode;
+import net.koozumaa.mazeapi.Mode;
 import net.koozumaa.mazegenerator.Utils.PlayerVar;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.Consumer;
 
 public class MainGenerator {
     public MazeGenerator plugin;
-
-    public MainGenerator(MazeGenerator plugin){
-        this.plugin = plugin;
-    }
     /**
-     *
      * Async maze generating algorithm
-     *
      */
     Random rand = new Random();
-
     boolean sendMsgs = false;
-    public void calculateMazeLocs(PlayerVar pVar, Consumer<ArrayList<Location>> callback) {
+
+    public MainGenerator(MazeGenerator plugin) {
+        this.plugin = plugin;
+    }
+
+    public void calculateMazeLocs(iPlayerVar pVar, Consumer<ArrayList<Location>> callback) {
         ArrayList<Location> locList = new ArrayList<>();
         Bukkit.getScheduler().runTaskAsynchronously(MazeGenerator.instance, () -> {
 
