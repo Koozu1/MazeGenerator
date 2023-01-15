@@ -1,28 +1,20 @@
 package net.koozumaa.mazegenerator;
 
-import net.koozumaa.mazegenerator.Utils.KoozuPair;
-import net.koozumaa.mazegenerator.Utils.MazeCalcUtils;
+import net.koozumaa.mazeapi.KoozuPair;
+import net.koozumaa.mazeapi.MazeCalcUtils;
 import org.bukkit.*;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Solver {
-
-    private final MazeGenerator plugin;
-
-    public Solver(MazeGenerator plugin) {
-        this.plugin = plugin;
-    }
-
     Location loca;
     Location lastVisited;
     Random random = new Random();
+
     public void solveMaze(final Location pos1, final Location pos2) {
 
-        MazeCalcUtils utils = new MazeCalcUtils(plugin);
-
-        KoozuPair<Location, Location> invertedLocations = utils.getInvertedLocations(pos1, pos2, pos1.getWorld());
+        KoozuPair<Location, Location> invertedLocations = MazeCalcUtils.getInvertedLocations(pos1, pos2, pos1.getWorld());
         final Location startLoc = invertedLocations.getKey();
         final Location finishLoc = invertedLocations.getValue();
 
@@ -38,10 +30,10 @@ public class Solver {
         new BukkitRunnable() {
             @Override
             public void run() {
-                ArrayList<Location> aroundLocs = utils.getBlocksAround(loca);
-                ArrayList<Location> aroundLocClone = utils.getBlocksAround(loca);
+                ArrayList<Location> aroundLocs = MazeCalcUtils.getBlocksAround(loca);
+                ArrayList<Location> aroundLocClone = MazeCalcUtils.getBlocksAround(loca);
                 for (int i = 0; i < aroundLocs.size(); i++) {
-                    if (!utils.isInRegion(aroundLocs.get(i), startLoc, finishLoc) || aroundLocs.get(i).getBlock().equals(lastVisited.getBlock()) || notRightPath.contains(aroundLocs.get(i))) {
+                    if (!MazeCalcUtils.isInRegion(aroundLocs.get(i), startLoc, finishLoc) || aroundLocs.get(i).getBlock().equals(lastVisited.getBlock()) || notRightPath.contains(aroundLocs.get(i))) {
                         aroundLocClone.remove(aroundLocs.get(i));
                         continue;
                     }

@@ -10,9 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>Plugin</artifactId>
-    <version>1</version>
     <build>
-        <finalName>MazeGenerator-${version}</finalName>
+        <finalName>MazeGenerator-${project.parent.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

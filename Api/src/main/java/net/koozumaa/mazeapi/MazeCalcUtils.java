@@ -1,25 +1,22 @@
-package net.koozumaa.mazegenerator.Utils;
+package net.koozumaa.mazeapi;
 
-import net.koozumaa.mazeapi.iPlayerVar;
-import net.koozumaa.mazegenerator.MazeGenerator;
 import org.bukkit.*;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 public class MazeCalcUtils {
-    private final MazeGenerator plugin;
-
-    public MazeCalcUtils(MazeGenerator plugin) {
-        this.plugin = plugin;
-    }
-
-    //MOST METHODS REQUIRE LOCATION pos1 < pos2
+    public static final int blockspersecond = 2000;
+    //Get the placeble blocks in the maze. Roof, Floor, Walls
+    //TODO: Outer walls
+    private static final Random random = new Random();
 
     //Pos1 to lower coord, pos2 to higher.
-    public KoozuPair<Location, Location> getInvertedLocations(final Location loc1, final Location loc2, World world) {
+    public static KoozuPair<Location, Location> getInvertedLocations(final Location loc1, final Location loc2, World world) {
         int startx = Math.min(loc1.getBlockX(), loc2.getBlockX());
         int endx = Math.max(loc1.getBlockX(), loc2.getBlockX());
 
@@ -35,34 +32,27 @@ public class MazeCalcUtils {
     }
 
     //Check if loc is in the 2d square of corner 1 & 2
-    public boolean isInRegion(Location location, Location corner1, Location corner2) {
-        int doubleCheck = 0;
-
-        if (location.getBlockX() >= corner1.getBlockX() && location.getBlockX() <= corner2.getBlockX()) {
-            doubleCheck += 1;
-        }
-        if (location.getBlockZ() >= corner1.getBlockZ() && location.getBlockZ() <= corner2.getBlockZ()) {
-            doubleCheck += 1;
-        }
-
-        if (doubleCheck == 2) {
-            return true;
-        }
-        return false;
+    public static boolean isInRegion(Location location, Location corner1, Location corner2) {
+        int minX = Math.min(corner1.getBlockX(), corner2.getBlockX());
+        int maxX = Math.max(corner1.getBlockX(), corner2.getBlockX());
+        int minZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
+        int maxZ = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
+        return location.getBlockX() >= minX && location.getBlockX() <= maxX && location.getBlockZ() >= minZ && location.getBlockZ() <= maxZ;
     }
 
+
     //Devides pos2 to 1/4 of original surface area
-    public Location devideLocation(final Location pos1, final Location pos2) {
+    public static Location devideLocation(final Location pos1, final Location pos2) {
         return pos1.clone().add((pos2.getBlockX() - pos1.getBlockX()) / 2, 0, (pos2.getBlockZ() - pos1.getBlockZ()) / 2);
     }
 
     //Checks if location is visited
-    public boolean isVisited(Location loc, ArrayList<Location> list) {
+    public static boolean isVisited(Location loc, ArrayList<Location> list) {
         return list.contains(loc);
     }
 
     //Get 4 locations around a location
-    public ArrayList<Location> getBlocksAround(Location loc) {
+    public static ArrayList<Location> getBlocksAround(Location loc) {
         Location aroundLoc1 = loc.clone().add(1, 0, 0);
         Location aroundLoc2 = loc.clone().subtract(1, 0, 0);
 
@@ -73,7 +63,7 @@ public class MazeCalcUtils {
     }
 
     //Get 4 locations around & return each if not visited and in region
-    public ArrayList<Location> getPossibleBlocksAround(Location loc, Location pos1, Location pos2, ArrayList<Location> visitedLocs) {
+    public static ArrayList<Location> getPossibleBlocksAround(Location loc, Location pos1, Location pos2, ArrayList<Location> visitedLocs) {
         ArrayList<Location> locs = getBlocksAround(loc);
         ArrayList<Location> pLocs = new ArrayList<>();
         locs.forEach(location -> {
@@ -86,8 +76,8 @@ public class MazeCalcUtils {
 
     //Place blocks with defined amount of blocks per second
     //TODO: Optimize with placing all block in a chunk at a time
-    public void placeBlocks(ArrayList<KoozuPair<Location, Material>> pairs, int blocksPerSecond, World world) {
-        Bukkit.getScheduler().runTask(MazeGenerator.instance, () -> {
+    public static void placeBlocks(ArrayList<KoozuPair<Location, Material>> pairs, int blocksPerSecond, World world, Plugin plugin) {
+        Bukkit.getScheduler().runTask(plugin, () -> {
             final int bpTick = blocksPerSecond / 20;
             new BukkitRunnable() {
                 @Override
@@ -105,18 +95,15 @@ public class MazeCalcUtils {
                     for (KoozuPair<Location, Material> pair : pairSubList) {
                         //world.getBlockAt(pair.getKey()).setType(pair.getValue());
                         pair.getKey().getBlock().setType(pair.getValue(), false);
-
-
                     }
                     pairs.removeAll(pairSubList);
-
                 }
-            }.runTaskTimer(MazeGenerator.instance, 0L, 1L);
+            }.runTaskTimer(plugin, 0L, 1L);
         });
     }
 
     //When stretching, multiply pairs to corects size and add wall inbetween
-    public ArrayList<Location> multiplyLocations(final Location pos1, final Location pos2, final Location mazeStartLocation) {
+    public static ArrayList<Location> multiplyLocations(final Location pos1, final Location pos2, final Location mazeStartLocation) {
         Location mPos1 = pos1.clone();
         Location mPos2 = pos2.clone();
 
@@ -130,23 +117,19 @@ public class MazeCalcUtils {
             between.add(0, 0, mPos1.getZ() < mPos2.getZ() ? 1 : -1);
         }
         return new ArrayList<>(Arrays.asList(mPos1, mPos2, between));
-
-
     }
+
     //center block
-    public Location toBlockLocation(Location loc) {
+    public static Location toBlockLocation(Location loc) {
         return new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
 
-    //Get the placeble blocks in the maze. Roof, Floor, Walls
-    //TODO: Outer walls
-    Random random = new Random();
-    public ArrayList<KoozuPair<Location, Material>> countMazeBlocks(iPlayerVar pVar, ArrayList<Location> locations) {
+    public static ArrayList<KoozuPair<Location, Material>> countMazeBlocks(Maze pVar, ArrayList<Location> locations) {
         ArrayList<KoozuPair<Location, Material>> blocks = new ArrayList<>();
         World world;
-        if(pVar.getUUID() == null){
+        if (pVar.getUUID() == null) {
             world = pVar.getWorld();
-        }else {
+        } else {
             world = Bukkit.getPlayer(pVar.getUUID()).getWorld();
         }
         Location pos1 = pVar.getPos1();
@@ -164,18 +147,18 @@ public class MazeCalcUtils {
                         }
 
                          */
-                        Material material = (pVar.getWallMaterials().isEmpty() ? Material.STONE : pVar.getWallMaterials().get(random.nextInt(pVar.getWallMaterials().size())));
+                        Material material = pVar.getMaterials().getWall().get(random.nextInt(pVar.getMaterials().getWall().size()));
                         //Pair<Location, Material> pair = new Pair<>(blockLockWY, material);
                         blocks.add(new KoozuPair<>(blockLockWY, material));
                         //Bukkit.getWorld(world.getName()).getBlockAt(blockLockWY).setType(material);
                     }
                 }
                 Location floorLoc = new Location(world, x, pos1.getY(), z);
-                Material floorMaterial = (pVar.getFloorMaterials().isEmpty() ? Material.STONE_BRICKS : pVar.getFloorMaterials().get(random.nextInt(pVar.getFloorMaterials().size())));
+                Material floorMaterial = pVar.getMaterials().getWall().get(random.nextInt(pVar.getMaterials().getWall().size()));
                 blocks.add(new KoozuPair<>(floorLoc, floorMaterial));
 
                 Location roofLoc = new Location(world, x, pos2.getY(), z);
-                Material roofMaterial = (pVar.getRoofMaterials().isEmpty() ? Material.GLASS : pVar.getRoofMaterials().get(random.nextInt(pVar.getRoofMaterials().size())));
+                Material roofMaterial = pVar.getMaterials().getRoof().get(random.nextInt(pVar.getMaterials().getRoof().size()));
                 blocks.add(new KoozuPair<>(roofLoc, roofMaterial));
 
             }
@@ -183,7 +166,7 @@ public class MazeCalcUtils {
         return blocks;
     }
 
-    public ArrayList<Location> stretchTo3Times(final ArrayList<Location> locList, final Location startLoc){
+    public static ArrayList<Location> stretchTo3Times(final ArrayList<Location> locList, final Location startLoc) {
         ArrayList<Location> stretchedLocs = new ArrayList<>();
         locList.forEach(loc -> {
             Location locMid = startLoc.clone().add((loc.clone().getBlockX() - startLoc.clone().getBlockX()) * 3, 0, (loc.clone().getBlockZ() - startLoc.clone().getBlockZ()) * 3);
@@ -199,38 +182,40 @@ public class MazeCalcUtils {
         });
         return stretchedLocs;
     }
-    public Location splitToThird(Location pos1, Location pos2){
+
+    public static Location splitToThird(Location pos1, Location pos2) {
         return pos1.clone().add((pos2.getBlockX() - pos1.getBlockX()) / 3, 0, (pos2.getBlockZ() - pos1.getBlockZ()) / 3);
     }
-    public ArrayList<Chunk> getChunksBetween(Location min, Location max, World world){
+
+    public static ArrayList<Chunk> getChunksBetween(Location min, Location max, World world) {
         ArrayList<Chunk> chunks = new ArrayList<>();
-        for (int x = min.getBlockX(); x <= max.getBlockX(); x += 16){
-            for (int z = min.getBlockZ(); z <= max.getBlockX(); z += 16){
+        for (int x = min.getBlockX(); x <= max.getBlockX(); x += 16) {
+            for (int z = min.getBlockZ(); z <= max.getBlockX(); z += 16) {
                 Chunk chunk = world.getChunkAt(x, z);
-                if (chunks.contains(chunk)){
+                if (chunks.contains(chunk)) {
                     continue;
                 }
                 chunks.add(chunk);
             }
         }
         Chunk chunk = world.getChunkAt(max);
-        if (!chunks.contains(chunk)){
+        if (!chunks.contains(chunk)) {
             chunks.add(chunk);
         }
         return chunks;
     }
 
-    public int randSeed(final int x,final int z){
+    public static int randSeed(final int x, final int z) {
         return ((x % 10 + 1) * (z));
     }
 
 
-    public int getRandomSeed(double randInt){
+    public static int getRandomSeed(double randInt) {
         String a = String.valueOf(randInt);
         String newa = "";
-        for (int i = 0; i < 8; i++){
+        for (int i = 0; i < 8; i++) {
             newa += a.substring(a.length() - 1);
-            a = a.substring(0, a.length() -1);
+            a = a.substring(0, a.length() - 1);
         }
         return Integer.parseInt(newa);
 

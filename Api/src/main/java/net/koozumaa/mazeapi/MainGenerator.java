@@ -1,39 +1,29 @@
-package net.koozumaa.mazegenerator.Generators;
+package net.koozumaa.mazeapi;
 
-import net.koozumaa.mazeapi.iPlayerVar;
-import net.koozumaa.mazegenerator.MazeGenerator;
-import net.koozumaa.mazegenerator.Utils.KoozuPair;
-import net.koozumaa.mazeapi.Mode;
-import net.koozumaa.mazegenerator.Utils.PlayerVar;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.plugin.Plugin;
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.Consumer;
 
 public class MainGenerator {
-    public MazeGenerator plugin;
-    /**
-     * Async maze generating algorithm
-     */
-    Random rand = new Random();
     boolean sendMsgs = false;
 
-    public MainGenerator(MazeGenerator plugin) {
-        this.plugin = plugin;
-    }
 
-    public void calculateMazeLocs(iPlayerVar pVar, Consumer<ArrayList<Location>> callback) {
+    public static void calculateMazeLocs(Maze pVar, Plugin plugin, Consumer<ArrayList<Location>> callback) {
+        Random rand = new Random();
         ArrayList<Location> locList = new ArrayList<>();
-        Bukkit.getScheduler().runTaskAsynchronously(MazeGenerator.instance, () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
             final Location start = pVar.getPos1();
             final Location finish;
 
             if (pVar.getGenMode().equals(Mode.SLIM3x3)) {
-                finish = plugin.utils.splitToThird(start.clone(), plugin.utils.devideLocation(start.clone(), pVar.getPos2()));
+                finish = MazeCalcUtils.splitToThird(start.clone(), MazeCalcUtils.devideLocation(start.clone(), pVar.getPos2()));
             } else {
-                finish = plugin.utils.devideLocation(start.clone(), pVar.getPos2());
+                finish = MazeCalcUtils.devideLocation(start.clone(), pVar.getPos2());
             }
 
 
@@ -44,9 +34,13 @@ public class MainGenerator {
             int surfaceArea = (Math.abs(start.getBlockX() - finish.getBlockX()) * Math.abs(start.getBlockZ() - finish.getBlockZ()));
 
             while (true) {
-                ArrayList<Location> possibleLocs = plugin.utils.getPossibleBlocksAround(iAmHere, start, finish, visitedLocs);
+                ArrayList<Location> possibleLocs = MazeCalcUtils.getPossibleBlocksAround(iAmHere, start, finish, visitedLocs);
                 if (possibleLocs.isEmpty()) {
                     if (whereWasI.size() <= 1) {
+                        points.forEach(p -> {
+                            locList.addAll(MazeCalcUtils.multiplyLocations(p.getKey(), p.getValue(), start));
+                        });
+                        callback.accept(locList);
                         break;
                     }
                     whereWasI.remove(iAmHere);
@@ -64,19 +58,8 @@ public class MainGenerator {
                 iAmHere = selectedLoc.clone();
                 whereWasI.add(iAmHere);
 
-                if (surfaceArea == visitedLocs.size()) {
-                    points.forEach(p -> {
-                        locList.addAll(plugin.utils.multiplyLocations(p.getKey(), p.getValue(), start));
-                    });
-                    callback.accept(locList);
-                    break;
-                }
             }
-
         });
-
     }
-
-
 }
 
