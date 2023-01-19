@@ -12,18 +12,18 @@ public class MainGenerator {
     boolean sendMsgs = false;
 
 
-    public static void calculateMazeLocs(Maze pVar, Plugin plugin, Consumer<ArrayList<Location>> callback) {
+    public static void calculateMazeLocs(Maze maze, Plugin plugin, Consumer<ArrayList<Location>> callback) {
         Random rand = new Random();
         ArrayList<Location> locList = new ArrayList<>();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
-            final Location start = pVar.getPos1();
+            final Location start = maze.getPos1();
             final Location finish;
 
-            if (pVar.getGenMode().equals(Mode.SLIM3x3)) {
-                finish = MazeCalcUtils.splitToThird(start.clone(), MazeCalcUtils.devideLocation(start.clone(), pVar.getPos2()));
+            if (maze.getGenMode().equals(Mode.SLIM3x3)) {
+                finish = MazeCalcUtils.splitToThird(start.clone(), MazeCalcUtils.devideLocation(start.clone(), maze.getPos2()));
             } else {
-                finish = MazeCalcUtils.devideLocation(start.clone(), pVar.getPos2());
+                finish = MazeCalcUtils.devideLocation(start.clone(), maze.getPos2());
             }
 
 

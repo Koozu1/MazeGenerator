@@ -141,26 +141,18 @@ public class MazeCalcUtils {
                 if (!locations.contains(blockLoc)) {
                     for (int y = pos1.getBlockY() + 1; y <= pos2.getBlockY() - 1; y++) {
                         Location blockLockWY = new Location(world, x, y, z);
-                        /*
-                        if (locations.contains(blockLoc)) {
-                            continue;
-                        }
-
-                         */
-                        Material material = pVar.getMaterials().getWall().get(random.nextInt(pVar.getMaterials().getWall().size()));
-                        //Pair<Location, Material> pair = new Pair<>(blockLockWY, material);
-                        blocks.add(new KoozuPair<>(blockLockWY, material));
-                        //Bukkit.getWorld(world.getName()).getBlockAt(blockLockWY).setType(material);
+                        Material wallMaterial = pVar.getMaterials().getWall().get(random.nextInt(pVar.getMaterials().getWall().size()));
+                        blocks.add(new KoozuPair<>(blockLockWY, wallMaterial));
                     }
                 }
                 Location floorLoc = new Location(world, x, pos1.getY(), z);
-                Material floorMaterial = pVar.getMaterials().getWall().get(random.nextInt(pVar.getMaterials().getWall().size()));
+
+                Material floorMaterial = pVar.getMaterials().getFloor().get(random.nextInt(pVar.getMaterials().getFloor().size()));
                 blocks.add(new KoozuPair<>(floorLoc, floorMaterial));
 
                 Location roofLoc = new Location(world, x, pos2.getY(), z);
                 Material roofMaterial = pVar.getMaterials().getRoof().get(random.nextInt(pVar.getMaterials().getRoof().size()));
                 blocks.add(new KoozuPair<>(roofLoc, roofMaterial));
-
             }
         }
         return blocks;
@@ -187,6 +179,12 @@ public class MazeCalcUtils {
         return pos1.clone().add((pos2.getBlockX() - pos1.getBlockX()) / 3, 0, (pos2.getBlockZ() - pos1.getBlockZ()) / 3);
     }
 
+    public static Location split(Location pos1, Location pos2, int i) {
+        double xDiff = pos2.getBlockX() - pos1.getBlockX();
+        double zDiff = pos2.getBlockZ() - pos1.getBlockZ();
+        return pos1.clone().add(xDiff / i, 0, zDiff / i);
+    }
+
     public static ArrayList<Chunk> getChunksBetween(Location min, Location max, World world) {
         ArrayList<Chunk> chunks = new ArrayList<>();
         for (int x = min.getBlockX(); x <= max.getBlockX(); x += 16) {
@@ -204,21 +202,4 @@ public class MazeCalcUtils {
         }
         return chunks;
     }
-
-    public static int randSeed(final int x, final int z) {
-        return ((x % 10 + 1) * (z));
-    }
-
-
-    public static int getRandomSeed(double randInt) {
-        String a = String.valueOf(randInt);
-        String newa = "";
-        for (int i = 0; i < 8; i++) {
-            newa += a.substring(a.length() - 1);
-            a = a.substring(0, a.length() - 1);
-        }
-        return Integer.parseInt(newa);
-
-    }
-
 }

@@ -37,6 +37,7 @@ public class GenManager{
                 case SLIM3x3:
 
                     ArrayList<Location> newLocList = MazeCalcUtils.stretchTo3Times(locations, pVar.getPos1());
+                    newLocList.forEach(location -> location.add(1, 0, 1));
                     locations.clear();
                     locations.addAll(newLocList);
                     sendCountDoneMessage(player, sendMsg);
