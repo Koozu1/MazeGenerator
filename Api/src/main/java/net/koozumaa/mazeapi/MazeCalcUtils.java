@@ -4,10 +4,7 @@ import org.bukkit.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class MazeCalcUtils {
     public static final int blockspersecond = 2000;
@@ -41,6 +38,8 @@ public class MazeCalcUtils {
     }
 
 
+
+
     //Devides pos2 to 1/4 of original surface area
     public static Location devideLocation(final Location pos1, final Location pos2) {
         return pos1.clone().add((pos2.getBlockX() - pos1.getBlockX()) / 2, 0, (pos2.getBlockZ() - pos1.getBlockZ()) / 2);
@@ -71,6 +70,16 @@ public class MazeCalcUtils {
                 pLocs.add(location);
             }
         });
+        return pLocs;
+    }
+    public static ArrayList<Location> getPossibleBlocksAroundNew(Location loc, Location pos1, Location pos2, HashSet<Location> visitedLocs) {
+        ArrayList<Location> locs = getBlocksAround(loc);
+        ArrayList<Location> pLocs = new ArrayList<>();
+        for (Location location : locs) {
+            if (isInRegion(location, pos1, pos2) && !visitedLocs.contains(location)) {
+                pLocs.add(location);
+            }
+        }
         return pLocs;
     }
 
@@ -156,6 +165,9 @@ public class MazeCalcUtils {
             }
         }
         return blocks;
+    }
+    public static void countMazeBlocksNew(Maze maze, HashSet<Location> locations){
+
     }
 
     public static ArrayList<Location> stretchTo3Times(final ArrayList<Location> locList, final Location startLoc) {

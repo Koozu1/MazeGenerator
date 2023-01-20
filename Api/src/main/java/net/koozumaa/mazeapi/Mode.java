@@ -22,5 +22,8 @@ public enum Mode{
         }
 
         public int length = 1;
+    },
+    EPIC{
+        public String toString(){return this.name();}
     }
 }

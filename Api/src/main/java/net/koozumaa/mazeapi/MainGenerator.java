@@ -4,8 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 public class MainGenerator {
@@ -13,10 +13,10 @@ public class MainGenerator {
 
 
     public static void calculateMazeLocs(Maze maze, Plugin plugin, Consumer<ArrayList<Location>> callback) {
+        long starttime = System.currentTimeMillis();
         Random rand = new Random();
         ArrayList<Location> locList = new ArrayList<>();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-
             final Location start = maze.getPos1();
             final Location finish;
 
@@ -25,8 +25,6 @@ public class MainGenerator {
             } else {
                 finish = MazeCalcUtils.devideLocation(start.clone(), maze.getPos2());
             }
-
-
             Location iAmHere = start.clone();
             ArrayList<Location> whereWasI = new ArrayList<>();
             ArrayList<Location> visitedLocs = new ArrayList<>();
@@ -40,6 +38,8 @@ public class MainGenerator {
                         points.forEach(p -> {
                             locList.addAll(MazeCalcUtils.multiplyLocations(p.getKey(), p.getValue(), start));
                         });
+                        long finishtime = System.currentTimeMillis();
+                        System.out.println("time is" + (finishtime - starttime));
                         callback.accept(locList);
                         break;
                     }
@@ -57,9 +57,58 @@ public class MainGenerator {
 
                 iAmHere = selectedLoc.clone();
                 whereWasI.add(iAmHere);
+            }
+        });
+    }
 
+    public static void calculateMazeLocsNew(Maze maze, Plugin plugin, Consumer<ArrayList<Location>> callback) {
+        long starttime = System.currentTimeMillis();
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
+        ArrayList<Location> locList = new ArrayList<>();
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            final Location start = maze.getPos1();
+            final Location finish;
+
+            if (maze.getGenMode().equals(Mode.SLIM3x3)) {
+                finish = MazeCalcUtils.splitToThird(start.clone(), MazeCalcUtils.devideLocation(start.clone(), maze.getPos2()));
+            } else {
+                finish = MazeCalcUtils.devideLocation(start.clone(), maze.getPos2());
+            }
+            Location iAmHere = start.clone();
+            LinkedList<Location> whereWasI = new LinkedList<>();
+            HashSet<Location> visitedLocs = new HashSet<>();
+            ArrayList<KoozuPair<Location, Location>> points = new ArrayList<>();
+
+            while (true) {
+                ArrayList<Location> possibleLocs = MazeCalcUtils.getPossibleBlocksAroundNew(iAmHere, start, finish, visitedLocs);
+                if (possibleLocs.isEmpty()) {
+                    if (whereWasI.size() <= 1) {
+                        points.forEach(p -> {
+                            locList.addAll(MazeCalcUtils.multiplyLocations(p.getKey(), p.getValue(), start));
+                        });
+                        long finishtime = System.currentTimeMillis();
+                        System.out.println("New time is" + (finishtime - starttime));
+                        callback.accept(locList);
+                        break;
+                    }
+
+                    if (rand.nextInt(2) == 1) {
+                        iAmHere = whereWasI.getLast();
+                        whereWasI.removeLast();
+                    } else {
+                        iAmHere = whereWasI.getFirst();
+                        whereWasI.removeFirst();
+                    }
+                    continue;
+                }
+                final Location selectedLoc = possibleLocs.get(rand.nextInt(possibleLocs.size()));
+                points.add(new KoozuPair<>(iAmHere, selectedLoc));
+                visitedLocs.add(selectedLoc);
+
+                iAmHere = selectedLoc.clone();
+                whereWasI.addLast(iAmHere);
+                //whereWasI.add(iAmHere);
             }
         });
     }
 }
-
