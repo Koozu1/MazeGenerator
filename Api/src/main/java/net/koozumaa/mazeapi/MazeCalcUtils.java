@@ -1,8 +1,15 @@
 package net.koozumaa.mazeapi;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import org.bukkit.*;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.*;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
@@ -38,8 +45,6 @@ public class MazeCalcUtils {
     }
 
 
-
-
     //Devides pos2 to 1/4 of original surface area
     public static Location devideLocation(final Location pos1, final Location pos2) {
         return pos1.clone().add((pos2.getBlockX() - pos1.getBlockX()) / 2, 0, (pos2.getBlockZ() - pos1.getBlockZ()) / 2);
@@ -72,6 +77,7 @@ public class MazeCalcUtils {
         });
         return pLocs;
     }
+
     public static ArrayList<Location> getPossibleBlocksAroundNew(Location loc, Location pos1, Location pos2, HashSet<Location> visitedLocs) {
         ArrayList<Location> locs = getBlocksAround(loc);
         ArrayList<Location> pLocs = new ArrayList<>();
@@ -141,6 +147,40 @@ public class MazeCalcUtils {
         } else {
             world = Bukkit.getPlayer(pVar.getUUID()).getWorld();
         }
+        Location pos1 = pVar.getPos1().clone();
+        Location pos2 = pVar.getPos2().clone();
+
+        for (int x = pos1.getBlockX(); x <= pos2.getBlockX(); x++) {
+            for (int z = pos1.getBlockZ(); z <= pos2.getBlockZ(); z++) {
+                Location blockLoc = new Location(world, x, pos1.getY(), z);
+                if (!locations.contains(blockLoc)) {
+                    for (int y = pos1.getBlockY() + 1; y <= pos2.getBlockY() - 1; y++) {
+                        Location blockLockWY = new Location(world, x, y, z);
+                        Material wallMaterial = pVar.getMaterials().getWall().get(random.nextInt(pVar.getMaterials().getWall().size()));
+                        blocks.add(new KoozuPair<>(blockLockWY, wallMaterial));
+                    }
+                }
+                Location floorLoc = new Location(world, x, pos1.getY(), z);
+
+                Material floorMaterial = pVar.getMaterials().getFloor().get(random.nextInt(pVar.getMaterials().getFloor().size()));
+                blocks.add(new KoozuPair<>(floorLoc, floorMaterial));
+
+                Location roofLoc = new Location(world, x, pos2.getY(), z);
+                Material roofMaterial = pVar.getMaterials().getRoof().get(random.nextInt(pVar.getMaterials().getRoof().size()));
+                blocks.add(new KoozuPair<>(roofLoc, roofMaterial));
+            }
+        }
+        return blocks;
+    }
+
+    public static ArrayList<KoozuPair<Location, Material>> countMazeBlocksNew(Maze pVar, HashSet<Location> locations) {
+        ArrayList<KoozuPair<Location, Material>> blocks = new ArrayList<>();
+        World world;
+        if (pVar.getUUID() == null) {
+            world = pVar.getWorld();
+        } else {
+            world = Bukkit.getPlayer(pVar.getUUID()).getWorld();
+        }
         Location pos1 = pVar.getPos1();
         Location pos2 = pVar.getPos2();
 
@@ -166,8 +206,41 @@ public class MazeCalcUtils {
         }
         return blocks;
     }
-    public static void countMazeBlocksNew(Maze maze, HashSet<Location> locations){
 
+    public static void placeByChunk(ArrayList<KoozuPair<Location, Material>> blocks, Plugin plugin) {
+        Bukkit.getConsoleSender().sendMessage("yes yes called yeah");
+        HashMap<Chunk, List<KoozuPair<Location, Material>>> data = new HashMap<>();
+        blocks.forEach(block -> {
+            if (data.containsKey(block.getKey().getChunk())) {
+                data.get(block.getKey().getChunk()).add(block);
+            } else {
+                data.put(block.getKey().getChunk(), new ArrayList<>(Collections.singletonList(block)));
+            }
+        });
+        Iterator<Map.Entry<Chunk, List<KoozuPair<Location, Material>>>> entrySet = data.entrySet().iterator();
+
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            new BukkitRunnable() {
+                int counter = 0;
+                final int size = data.size();
+
+                @Override
+                public void run() {
+                    for (int i = 0; i < 5; i++) {
+                        Bukkit.getConsoleSender().sendMessage("loopedi loop :) " + counter + "/" + size);
+                        if (entrySet.hasNext()) {
+                            counter++;
+                            Map.Entry<Chunk, List<KoozuPair<Location, Material>>> chunk = entrySet.next();
+                            chunk.getValue().forEach((pair) -> {
+                                pair.getKey().getBlock().setType(pair.getValue());
+                            });
+                        } else {
+                            cancel();
+                        }
+                    }
+                }
+            }.runTaskTimer(plugin, 2L, 2L);
+        });
     }
 
     public static ArrayList<Location> stretchTo3Times(final ArrayList<Location> locList, final Location startLoc) {
@@ -187,6 +260,31 @@ public class MazeCalcUtils {
         return stretchedLocs;
     }
 
+    /**
+     * @param size for example 3 would be 3x3 blocks.
+     */
+    public static ArrayList<Location> stretch(ArrayList<Location> locations, final Location start, final int size) {
+        System.out.println("dadada " + (size % 2));
+        ArrayList<Location> stretched = new ArrayList<>();
+        if (size == 1) {
+            locations.forEach(loc -> {
+                Location locMid = start.clone().add((loc.clone().getBlockX() - start.clone().getBlockX()) * size, 0, (loc.clone().getBlockZ() - start.clone().getBlockZ()) * size);
+                stretched.add(locMid);
+            });
+            return locations;
+        }
+        int sizeModifier = (size - 1) / 2;
+        locations.forEach(loc -> {
+            Location locMid = start.clone().add((loc.clone().getBlockX() - start.clone().getBlockX()) * size, 0, (loc.clone().getBlockZ() - start.clone().getBlockZ()) * size);
+            for (int x = (sizeModifier * -1); x <= sizeModifier; x++) {
+                for (int z = (sizeModifier * -1); z <= sizeModifier; z++) {
+                    stretched.add(locMid.clone().add(x, 0, z));
+                }
+            }
+        });
+        return stretched;
+    }
+
     public static Location splitToThird(Location pos1, Location pos2) {
         return pos1.clone().add((pos2.getBlockX() - pos1.getBlockX()) / 3, 0, (pos2.getBlockZ() - pos1.getBlockZ()) / 3);
     }
@@ -195,6 +293,81 @@ public class MazeCalcUtils {
         double xDiff = pos2.getBlockX() - pos1.getBlockX();
         double zDiff = pos2.getBlockZ() - pos1.getBlockZ();
         return pos1.clone().add(xDiff / i, 0, zDiff / i);
+    }
+
+    public static void glowBlock(Location location, Maze maze) {
+        /*
+        FallingBlock fallingBlock = location.getWorld().spawnFallingBlock(location.clone().add(0.5, 0, 0.5), Material.SAND.createBlockData());
+        fallingBlock.setGravity(false);
+        fallingBlock.setDropItem(false);
+        fallingBlock.shouldAutoExpire(false);
+        fallingBlock.setGlowing(true);
+
+
+
+        Slime slime = (Slime) location.getWorld().spawnEntity(location.add(0.5, 0, 0.5), EntityType.SLIME);
+        slime.setCollidable(false);
+        slime.setSize(2);
+        slime.setWander(false);
+        slime.setAware(false);
+        slime.setInvulnerable(true);
+        slime.setGlowing(true);
+        slime.setGravity(false);
+        slime.setInvisible(true);
+        slime.setInvulnerable(true);
+        slime.setAI(false);
+
+         */
+
+        double minX = location.getX();
+        double maxX = minX + 1;
+        double minY = location.getY();
+        double maxY = minY + 1;
+        double minZ = location.getZ();
+        double maxZ = minZ + 1;
+        for (double x = minX; x <= maxX; x += 0.25) {
+            for (double y = minY; y <= maxY; y += 0.25) {
+                for (double z = minZ; z <= maxZ; z += 0.25) {
+                    boolean a = (x == minX || x == maxX);
+                    boolean b = (y == minY || y == maxY);
+                    boolean c = (z == minZ || z == maxZ);
+                    if (a ? b || c : b && c) {
+                        location.getWorld().spawnParticle(new ParticleBuilder(Particle.REDSTONE).color(Color.RED).location(location.getWorld(), x, y, z).allPlayers().particle());
+                        new ParticleBuilder(Particle.REDSTONE).color(Color.RED).location(location.getWorld(), x, y, z).allPlayers().;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void getNearbyPossiblePositions(Maze maze, int range, int mazeWallSize) {
+        for (int x = -range; x < range; x++) {
+            for (int z = -range; z < range; z++) {
+                Location compare = maze.getPos2().clone().add(x, 0, z);
+                compare.setY(maze.getPos1().getY());
+                if (isPossibleLoc(maze.getPos1(), compare, mazeWallSize)) {
+                    glowBlock(maze.getPos2(), maze);
+                }
+            }
+        }
+    }
+
+    public static boolean isPossibleLoc(Location start, Location pos, int mazeWallSize) {
+        if (!isEvenLocation(start, pos)) {
+            return false;
+        }
+        if ((pos.clone().subtract(start.clone()).getBlockX() - 1) % mazeWallSize != 0) {
+            return false;
+        }
+        if ((pos.clone().subtract(start.clone()).getBlockZ() - 1) % mazeWallSize != 0) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isEvenLocation(Location pos1, Location pos2) {
+        return (Math.abs(pos1.getBlockX() - pos2.getBlockX()) % 2 == 0)
+                && (Math.abs(pos1.getBlockZ() - pos2.getBlockZ()) % 2 == 0);
     }
 
     public static ArrayList<Chunk> getChunksBetween(Location min, Location max, World world) {
@@ -214,4 +387,6 @@ public class MazeCalcUtils {
         }
         return chunks;
     }
+
+
 }

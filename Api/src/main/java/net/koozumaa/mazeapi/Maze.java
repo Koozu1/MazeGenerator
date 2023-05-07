@@ -17,6 +17,7 @@ public class Maze {
     private boolean sendMessages = true;
     private Materials materials = new Materials();
     private World world;
+    public int size = 5;
 
     public Maze() {
 
@@ -41,7 +42,7 @@ public class Maze {
     }
 
     public Location getPos1() {
-        return pos1;
+        return pos1.clone();
     }
 
     public void setPos1(Location pos1) {
@@ -49,7 +50,7 @@ public class Maze {
     }
 
     public Location getPos2() {
-        return pos2;
+        return pos2.clone();
     }
 
     public void setPos2(Location pos2) {

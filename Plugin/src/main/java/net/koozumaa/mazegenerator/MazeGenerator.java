@@ -2,6 +2,9 @@ package net.koozumaa.mazegenerator;
 
 import net.koozumaa.mazeapi.Maze;
 import net.koozumaa.mazegenerator.Tab.TabCompleter;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Slime;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 import java.util.UUID;

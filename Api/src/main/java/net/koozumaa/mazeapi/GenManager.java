@@ -26,10 +26,14 @@ public class GenManager{
         if (genMode == Mode.CUSTOM){
             MainGenerator.calculateMazeLocsNew(pVar, plugin ,locations -> {
                 ArrayList<KoozuPair<Location, Material>> blocks;
+                ArrayList<Location> newLocList = MazeCalcUtils.stretch(new ArrayList<>(locations), pVar.getPos1().clone(), pVar.size);
+                newLocList.forEach(loc -> loc.add((pVar.size - 1) / 2, 0 , (pVar.size - 1) / 2));
+                locations.clear();
+                locations.addAll(newLocList);
                 sendCountDoneMessage(player, sendMsg);
-                blocks = MazeCalcUtils.countMazeBlocks(pVar, locations);
+                blocks = MazeCalcUtils.countMazeBlocksNew(pVar, locations);
                 sendStartBPMessage(player, sendMsg);
-                MazeCalcUtils.placeBlocks(blocks, pVar.getBps(), world, plugin);
+                MazeCalcUtils.placeByChunk(blocks, plugin);
             });
         }else {
 
@@ -37,16 +41,14 @@ public class GenManager{
                 ArrayList<KoozuPair<Location, Material>> blocks;
                 switch (genMode) {
                     case NORMAL:
-                        //ArrayList<Location> normLocs =  plugin.utils.stretchTo3Times(mazeBlocks, pos1);
                         sendCountDoneMessage(player, sendMsg);
-                        //blocks = MazeCalcUtils.countMazeBlocks(pVar, locations);
+                        blocks = MazeCalcUtils.countMazeBlocks(pVar, locations);
                         sendStartBPMessage(player, sendMsg);
-                        //MazeCalcUtils.placeBlocks(blocks, pVar.getBps(), world, plugin);
+                        MazeCalcUtils.placeBlocks(blocks, pVar.getBps(), world, plugin);
                         break;
                     case SLIM3x3:
-
-                        ArrayList<Location> newLocList = MazeCalcUtils.stretchTo3Times(locations, pVar.getPos1());
-                        newLocList.forEach(location -> location.add(1, 0, 1));
+                        ArrayList<Location> newLocList = MazeCalcUtils.stretch(locations, pVar.getPos1(), pVar.size);
+                        newLocList.forEach(loc -> loc.add((pVar.size - 1) / 2, 0 , (pVar.size - 1) / 2));
                         locations.clear();
                         locations.addAll(newLocList);
                         sendCountDoneMessage(player, sendMsg);

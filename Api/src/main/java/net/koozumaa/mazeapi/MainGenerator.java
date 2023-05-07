@@ -17,11 +17,11 @@ public class MainGenerator {
         Random rand = new Random();
         ArrayList<Location> locList = new ArrayList<>();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            final Location start = maze.getPos1();
+            final Location start = maze.getPos1().clone();
             final Location finish;
 
             if (maze.getGenMode().equals(Mode.SLIM3x3)) {
-                finish = MazeCalcUtils.splitToThird(start.clone(), MazeCalcUtils.devideLocation(start.clone(), maze.getPos2()));
+                finish = MazeCalcUtils.split(start.clone(), MazeCalcUtils.devideLocation(start.clone(), maze.getPos2()), maze.size);
             } else {
                 finish = MazeCalcUtils.devideLocation(start.clone(), maze.getPos2());
             }
@@ -61,12 +61,12 @@ public class MainGenerator {
         });
     }
 
-    public static void calculateMazeLocsNew(Maze maze, Plugin plugin, Consumer<ArrayList<Location>> callback) {
+    public static void calculateMazeLocsNew(Maze maze, Plugin plugin, Consumer<HashSet<Location>> callback) {
         long starttime = System.currentTimeMillis();
         ThreadLocalRandom rand = ThreadLocalRandom.current();
-        ArrayList<Location> locList = new ArrayList<>();
+        HashSet<Location> locList = new HashSet<>();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            final Location start = maze.getPos1();
+            final Location start = maze.getPos1().clone();
             final Location finish;
 
             if (maze.getGenMode().equals(Mode.SLIM3x3)) {
@@ -87,7 +87,7 @@ public class MainGenerator {
                             locList.addAll(MazeCalcUtils.multiplyLocations(p.getKey(), p.getValue(), start));
                         });
                         long finishtime = System.currentTimeMillis();
-                        System.out.println("New time is" + (finishtime - starttime));
+                        System.out.println("testNew time is" + (finishtime - starttime));
                         callback.accept(locList);
                         break;
                     }

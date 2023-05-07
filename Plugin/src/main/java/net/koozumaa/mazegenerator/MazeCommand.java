@@ -13,10 +13,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 public class MazeCommand implements CommandExecutor {
     public MazeGenerator plugin;
+
     public MazeCommand(MazeGenerator plugin) {
         this.plugin = plugin;
     }
@@ -28,9 +30,9 @@ public class MazeCommand implements CommandExecutor {
         Player p = (Player) sender;
         Maze mplayer;
 
-        if(plugin.players.containsKey(p.getUniqueId())){
+        if (plugin.players.containsKey(p.getUniqueId())) {
             mplayer = plugin.players.get(p.getUniqueId());
-        }else {
+        } else {
             mplayer = new Maze();
             mplayer.setUUID(p.getUniqueId());
             plugin.players.put(p.getUniqueId(), mplayer);
@@ -41,10 +43,12 @@ public class MazeCommand implements CommandExecutor {
                 case "pos1":
                     mplayer.setPos1(MazeCalcUtils.toBlockLocation(p.getLocation().getBlock().getLocation()));
                     p.sendMessage(MazeGenerator.commandPrefix + "Sijainti 1 asetettu");
+                    MazeCalcUtils.glowBlock(mplayer.getPos1(), mplayer);
                     break;
                 case "pos2":
                     mplayer.setPos2(MazeCalcUtils.toBlockLocation(p.getLocation().getBlock().getLocation()));
                     p.sendMessage(MazeGenerator.commandPrefix + "Sijainti 2 asetettu");
+                    MazeCalcUtils.getNearbyPossiblePositions(mplayer, 20, mplayer.size);
                     break;
                 case "variables":
                     variableMessage(mplayer);
@@ -79,7 +83,7 @@ public class MazeCommand implements CommandExecutor {
                     GenManager.genMaze(mplayer, MazeGenerator.instance);
                     break;
                 case "clearroofmaterials":
-                    if (mplayer.getMaterials().getRoof().isEmpty()){
+                    if (mplayer.getMaterials().getRoof().isEmpty()) {
                         p.sendMessage(MazeGenerator.commandPrefix + "Katon materiaalit olivat jo tyhjät!");
                         break;
                     }
@@ -87,7 +91,7 @@ public class MazeCommand implements CommandExecutor {
                     mplayer.getMaterials().setRoof(new ArrayList<>());
                     break;
                 case "clearwallmaterials":
-                    if (mplayer.getMaterials().getWall().isEmpty()){
+                    if (mplayer.getMaterials().getWall().isEmpty()) {
                         p.sendMessage(MazeGenerator.commandPrefix + "Seinien materiaalit olivat jo tyhjät!");
                         break;
                     }
@@ -95,7 +99,7 @@ public class MazeCommand implements CommandExecutor {
                     mplayer.getMaterials().setWall(new ArrayList<>());
                     break;
                 case "clearfloormaterials":
-                    if (mplayer.getMaterials().getFloor().isEmpty()){
+                    if (mplayer.getMaterials().getFloor().isEmpty()) {
                         p.sendMessage(MazeGenerator.commandPrefix + "Lattian materiaalit olivat jo tyhjät!");
                         break;
                     }
@@ -138,7 +142,7 @@ public class MazeCommand implements CommandExecutor {
                 case "blockspersecond":
                     try {
                         mplayer.setBps(Integer.parseInt(args[1]));
-                    }catch (NumberFormatException exception){
+                    } catch (NumberFormatException exception) {
                         p.sendMessage(MazeGenerator.commandPrefix + args[1] + " ei ole numero! Asetettu vakioksi §9" + 2000);
                         mplayer.setBps(2000);
                         return true;
@@ -148,13 +152,21 @@ public class MazeCommand implements CommandExecutor {
                 case "mode":
                     Optional<Mode> mode = Arrays.stream(Mode.values()).filter(gM -> gM.name().equalsIgnoreCase(args[1])).findFirst();
 
-                    if (!mode.isPresent()){
+                    if (!mode.isPresent()) {
                         p.sendMessage(MazeGenerator.commandPrefix + "Tätä tilaa ei ole olemassa.");
                         break;
                     }
                     mplayer.setGenMode(mode.get());
                     p.sendMessage(MazeGenerator.commandPrefix + mplayer.getGenMode().name() + "-tila asetettu");
                     break;
+                case "size":
+                    try {
+                        mplayer.size = Integer.parseInt(args[1]);
+                    } catch (NumberFormatException exception) {
+                        p.sendMessage(MazeGenerator.commandPrefix + args[1] + " ei ole numero!");
+                        return true;
+                    }
+                    p.sendMessage(MazeGenerator.commandPrefix + "koko =  §9" + mplayer.size);
             }
         }
         return true;
@@ -170,17 +182,18 @@ public class MazeCommand implements CommandExecutor {
     public void variableMessage(Maze pVar) {
         Player player = Bukkit.getPlayer(pVar.getUUID());
         player.sendMessage(MazeGenerator.commandPrefix + "Muuttujat:");
-        if (pVar.getPos1() == null){
+        if (pVar.getPos1() == null) {
             player.sendMessage("§9| §7pos1 = §5null");
-        }else {
+        } else {
             player.sendMessage("§9| §7pos1 = §9" + pVar.getPos1().getBlockX() + "x, " + pVar.getPos1().getBlockY() + "y, " + pVar.getPos1().getBlockZ() + "z");
         }
-        if (pVar.getPos2() == null){
+        if (pVar.getPos2() == null) {
             player.sendMessage("§9| §7pos2 = §5null");
-        }else {
+        } else {
             player.sendMessage("§9| §7pos2 = §9" + pVar.getPos2().getBlockX() + "x, " + pVar.getPos2().getBlockY() + "y, " + pVar.getPos2().getBlockZ() + "z");
         }
         player.sendMessage("§9| §7Palikoita sekunissa: §9" + pVar.getBps());
+        player.sendMessage("§9| §7Palikoita sekunissa: §9" + pVar.getGenMode());
 
         String roofMat = "§9| [Katon materiaalit]";
         String roofTitle = "§9Katon materiaalit:§7";
@@ -201,7 +214,8 @@ public class MazeCommand implements CommandExecutor {
         player.spigot().sendMessage(floorComponent);
 
     }
-    public String getMaterialString(ArrayList<Material> mat, String title){
+
+    public String getMaterialString(ArrayList<Material> mat, String title) {
         String wallMats = title;
         for (Material material : mat) {
             wallMats += "\n" + material;
